@@ -51,20 +51,38 @@ def sliceMat(im):
 
 
 def SLTmap(im1, im2):
-    # TODO: implement fucntion
+    TM = np.zeros(256)
+    slice_mat = sliceMat(im1)
+
+    for gray_val in range(0, 256):
+        img = im2.clone()
+
+        # Put the i'th slice over the image
+        correspond = slice_mat[:gray_val] == 0
+        img[correspond] = 0
+
+        TM[gray_val] = img[img != 0].mean()
+
     return mapImage(im1, TM), TM
 
 
 def mapImage(im, tm):
-    # TODO: implement fucntion
-    return TMim
+    new_img = im.clone()
+    slice_mat = sliceMat(im)
+
+    for gray_val in range(0, 256):
+        correspond = slice_mat[:gray_val] == 1
+        new_img[correspond] = tm[gray_val]
+
+    return new_img.reshape(im.rows(), im.cols())
 
 
 def sltNegative(im):
-    # TODO: implement fucntion - one line
-    return nim
+    return mapImage(im, 255 - np.arange(255))
 
 
 def sltThreshold(im, thresh):
-    # TODO: implement fucntion
-    return nim
+    tone_mapping = np.arange(255)
+    tone_mapping[tone_mapping <= thresh] = 0
+    tone_mapping[tone_mapping > thresh] = 255
+    return mapImage(im, tone_mapping)
