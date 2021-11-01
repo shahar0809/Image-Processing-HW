@@ -1,6 +1,8 @@
-import cv2
+import cv2.cv2 as cv2
 import numpy as np
 import matplotlib.pyplot as plt
+
+MAX_GRAY_VAL = 255
 
 
 def print_IDs():
@@ -25,20 +27,21 @@ def showMapping(old_range, a, b):
     y = a * x + b
     plt.figure()
     plt.plot(x, y)
-    plt.xlim([0, 255])
-    plt.ylim([0, 255])
+    plt.xlim([0, MAX_GRAY_VAL])
+    plt.ylim([0, MAX_GRAY_VAL])
     plt.title('contrast enhance mapping')
 
 
 def minkowski2Dist(im1, im2):
     d = 0
-    hist1 = np.histogram(im1, bins=256, range=(0, 255))
-    hist2 = np.histogram(im2, bins=256, range=(0, 255))
 
-    for k in range(256):
-        d += pow(abs(hist1[k] - hist2[k]), 2)
+    hist1 = np.histogram(im1, bins=MAX_GRAY_VAL + 1, range=(0, MAX_GRAY_VAL), density=True)[0]
+    hist2 = np.histogram(im2, bins=MAX_GRAY_VAL + 1, range=(0, MAX_GRAY_VAL), density=True)[0]
 
-    return pow(d, 0.5)
+    for k in range(MAX_GRAY_VAL + 1):
+        d += np.power(float(np.abs(hist1[k] - hist2[k])), 2)
+
+    return np.power(d, 0.5)
 
 
 def meanSqrDist(im1, im2):
@@ -51,10 +54,10 @@ def sliceMat(im):
 
 
 def SLTmap(im1, im2):
-    TM = np.zeros(256)
+    TM = np.zeros(MAX_GRAY_VAL + 1)
     slice_mat = sliceMat(im1)
 
-    for gray_val in range(0, 256):
+    for gray_val in range(0, MAX_GRAY_VAL + 1):
         img = im2.clone()
 
         # Put the i'th slice over the image
@@ -70,7 +73,7 @@ def mapImage(im, tm):
     new_img = im.clone()
     slice_mat = sliceMat(im)
 
-    for gray_val in range(0, 256):
+    for gray_val in range(0, MAX_GRAY_VAL + 1):
         correspond = slice_mat[:gray_val] == 1
         new_img[correspond] = tm[gray_val]
 
@@ -78,11 +81,11 @@ def mapImage(im, tm):
 
 
 def sltNegative(im):
-    return mapImage(im, 255 - np.arange(255))
+    return mapImage(im, MAX_GRAY_VAL - np.arange(MAX_GRAY_VAL))
 
 
 def sltThreshold(im, thresh):
-    tone_mapping = np.arange(255)
+    tone_mapping = np.arange(MAX_GRAY_VAL)
     tone_mapping[tone_mapping <= thresh] = 0
-    tone_mapping[tone_mapping > thresh] = 255
+    tone_mapping[tone_mapping > thresh] = MAX_GRAY_VAL
     return mapImage(im, tone_mapping)
