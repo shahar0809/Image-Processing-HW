@@ -55,6 +55,7 @@ def sliceMat(im):
     for gray_val in range(0, MAX_GRAY_VAL + 1):
         slices[:, gray_val] = original_img
         slices[:, gray_val][slices[:, gray_val] != gray_val] = 0
+        slices[:, gray_val][slices[:, gray_val] == gray_val] = 1
     return slices
 
 

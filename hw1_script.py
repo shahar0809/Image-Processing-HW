@@ -75,7 +75,7 @@ if __name__ == "__main__":
     print("d ------------------------------------\n")
 
     d = np.dot(sliceMat(fruit_img_gray), np.arange(MAX_GRAY_VAL + 1)).reshape(fruit_img_gray.shape) - fruit_img_gray
-    print("".format(d))
+    print("{}".format(d))
 
     # print("e ------------------------------------\n")
     #
