@@ -2,7 +2,6 @@ import matplotlib.pyplot as plt
 
 from hw1_functions import *
 
-
 if __name__ == "__main__":
     # Read image from folder
     path_image = r'Images\darkimage.tif'
@@ -36,13 +35,12 @@ if __name__ == "__main__":
     # Print results from second contrast enhancement
     print("enhancing an already enhanced image\n")
     print("a = {}, b = {}\n".format(a, b))
-    
+
     # TODO: display the difference between the two image (Do not simply display both images)
     plt.figure()
     plt.imshow(enhanced2_img - enhanced_img, cmap='gray', vmin=0, vmax=255)
     plt.title("Difference between enhancement images")
     plt.show()
-
 
     print("c ------------------------------------\n")
     minkowski_dist = minkowski2Dist(dark_img_gray, dark_img_gray)
@@ -60,7 +58,7 @@ if __name__ == "__main__":
     dists = []
 
     k = max_gray_val / 20
-    for step in range (0, 20):
+    for step in range(0, 20):
         curr_max_val = max_gray_val + k * step
         contrasts += [curr_max_val - min_gray_val]
 
@@ -76,11 +74,8 @@ if __name__ == "__main__":
 
     print("d ------------------------------------\n")
 
-
-    d = sliceMat(fruit_img_gray) * np.arange(MAX_GRAY_VAL) - fruit_img_gray
+    d = np.dot(sliceMat(fruit_img_gray), np.arange(MAX_GRAY_VAL + 1)).reshape(fruit_img_gray.shape) - fruit_img_gray
     print("".format(d))
-
-
 
     # print("e ------------------------------------\n")
     #

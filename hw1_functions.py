@@ -49,8 +49,13 @@ def meanSqrDist(im1, im2):
 
 
 def sliceMat(im):
-    # TODO: implement fucntion
-    return Slices
+    num_of_pixels = np.size(im.ravel())
+    original_img = im.ravel()
+    slices = np.zeros((num_of_pixels, MAX_GRAY_VAL + 1))
+    for gray_val in range(0, MAX_GRAY_VAL + 1):
+        slices[:, gray_val] = original_img
+        slices[:, gray_val][slices[:, gray_val] != gray_val] = 0
+    return slices
 
 
 def SLTmap(im1, im2):
