@@ -71,8 +71,6 @@ def SLTmap(im1, im2):
     slice_mat = sliceMat(im1)
 
     for gray_val in range(0, MAX_GRAY_VAL + 1):
-        img = im2
-
         bits_count = float(np.sum(slice_mat[:, gray_val]))
         if bits_count == 0:
             TM[gray_val] = 0

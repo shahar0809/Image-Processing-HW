@@ -87,12 +87,12 @@ if __name__ == "__main__":
     # Display results of comparison
     plt.figure()
     plt.subplot(1, 2, 1)
-    plt.imshow(dark_img_gray)
+    plt.imshow(enhanced_img, cmap='gray', vmin=0, vmax=255)
     plt.title("original image")
     plt.subplot(1, 2, 2)
     plt.imshow(tone_mapped_img, cmap='gray', vmin=0, vmax=255)
     plt.title("tone mapped")
-
+    plt.show()
 
     # print("f ------------------------------------\n")
     # negative_im = sltNegative(dark_img_gray)
