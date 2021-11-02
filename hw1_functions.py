@@ -49,13 +49,20 @@ def meanSqrDist(im1, im2):
 
 
 def sliceMat(im):
-    num_of_pixels = np.size(im.ravel())
     original_img = im.ravel()
-    slices = np.zeros((num_of_pixels, MAX_GRAY_VAL + 1))
-    for gray_val in range(0, MAX_GRAY_VAL + 1):
+    slices = np.full((np.size(im.ravel()), MAX_GRAY_VAL + 1), -1)
+
+    # Special case for 0
+    slices[:, 0] = original_img
+    slices[:, 0][slices[:, 0] == 0] = -1
+    slices[:, 0][slices[:, 0] != -1] = 0
+    slices[:, 0][slices[:, 0] == -1] = 1
+
+    for gray_val in range(1, MAX_GRAY_VAL + 1):
         slices[:, gray_val] = original_img
         slices[:, gray_val][slices[:, gray_val] != gray_val] = 0
         slices[:, gray_val][slices[:, gray_val] == gray_val] = 1
+
     return slices
 
 
@@ -64,26 +71,25 @@ def SLTmap(im1, im2):
     slice_mat = sliceMat(im1)
 
     for gray_val in range(0, MAX_GRAY_VAL + 1):
-        img = im2.clone()
+        img = im2
 
-        # Put the i'th slice over the image
-        correspond = slice_mat[:gray_val] == 0
-        img[correspond] = 0
-
-        TM[gray_val] = img[img != 0].mean()
+        bits_count = float(np.sum(slice_mat[:, gray_val]))
+        if bits_count == 0:
+            TM[gray_val] = 0
+        else:
+            TM[gray_val] = np.matmul(slice_mat[:, gray_val], im2.ravel()) / bits_count
 
     return mapImage(im1, TM), TM
 
 
 def mapImage(im, tm):
-    new_img = im.clone()
     slice_mat = sliceMat(im)
+    new_slice_mat = np.zeros((np.size(im.ravel()), MAX_GRAY_VAL + 1))
 
     for gray_val in range(0, MAX_GRAY_VAL + 1):
-        correspond = slice_mat[:gray_val] == 1
-        new_img[correspond] = tm[gray_val]
+        new_slice_mat[int(tm[gray_val])] = slice_mat[gray_val]
 
-    return new_img.reshape(im.rows(), im.cols())
+    return np.matmul(new_slice_mat, np.arange(MAX_GRAY_VAL + 1))
 
 
 def sltNegative(im):

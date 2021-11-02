@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import numpy as np
 
 from hw1_functions import *
 
@@ -77,22 +78,22 @@ if __name__ == "__main__":
     d = np.dot(sliceMat(fruit_img_gray), np.arange(MAX_GRAY_VAL + 1)).reshape(fruit_img_gray.shape) - fruit_img_gray
     print("{}".format(d))
 
-    # print("e ------------------------------------\n")
-    #
-    # d = # computationally compare
-    # print("sum of diff between image and slices*[0..255] = {}".format(d))
-    #
-    # # then display
-    # plt.figure()
-    # plt.subplot(1, 2, 1)
-    # plt.imshow(dark_img)
-    # plt.title("original image")
-    # plt.subplot(1, 2, 2)
-    # plt.imshow(TMim, cmap='gray', vmin=0, vmax=255)
-    # plt.title("tone mapped")
-    #
-    #
-    #
+    print("e ------------------------------------\n")
+    tone_mapping = SLTmap(dark_img_gray, enhanced_img)[1]
+    tone_mapped_img = np.matmul(sliceMat(dark_img_gray), tone_mapping).reshape(dark_img_gray.shape)
+    d = tone_mapped_img - enhanced_img
+    print("sum of diff between image and slices*[0..255] = {}".format(d))
+
+    # Display results of comparison
+    plt.figure()
+    plt.subplot(1, 2, 1)
+    plt.imshow(dark_img_gray)
+    plt.title("original image")
+    plt.subplot(1, 2, 2)
+    plt.imshow(tone_mapped_img, cmap='gray', vmin=0, vmax=255)
+    plt.title("tone mapped")
+
+
     # print("f ------------------------------------\n")
     # negative_im = sltNegative(dark_img_gray)
     # plt.figure()
