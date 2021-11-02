@@ -82,20 +82,20 @@ def SLTmap(im1, im2):
 
 def mapImage(im, tm):
     slice_mat = sliceMat(im)
-    new_slice_mat = np.zeros((np.size(im.ravel()), MAX_GRAY_VAL + 1))
+    new_slice_mat = np.zeros(slice_mat.shape)
 
     for gray_val in range(0, MAX_GRAY_VAL + 1):
-        new_slice_mat[int(tm[gray_val])] = slice_mat[gray_val]
+        new_slice_mat[:, int(tm[gray_val])] = slice_mat[:, gray_val]
 
-    return np.matmul(new_slice_mat, np.arange(MAX_GRAY_VAL + 1))
+    return np.matmul(new_slice_mat, np.arange(MAX_GRAY_VAL + 1)).reshape(im.shape)
 
 
 def sltNegative(im):
-    return mapImage(im, MAX_GRAY_VAL - np.arange(MAX_GRAY_VAL))
+    return mapImage(im, MAX_GRAY_VAL - np.arange(MAX_GRAY_VAL + 1))
 
 
 def sltThreshold(im, thresh):
-    tone_mapping = np.arange(MAX_GRAY_VAL)
+    tone_mapping = np.arange(MAX_GRAY_VAL + 1)
     tone_mapping[tone_mapping <= thresh] = 0
     tone_mapping[tone_mapping > thresh] = MAX_GRAY_VAL
     return mapImage(im, tone_mapping)

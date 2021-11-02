@@ -94,26 +94,26 @@ if __name__ == "__main__":
     plt.title("tone mapped")
     plt.show()
 
-    # print("f ------------------------------------\n")
-    # negative_im = sltNegative(dark_img_gray)
-    # plt.figure()
-    # plt.imshow(negative_im, cmap='gray', vmin=0, vmax=255)
-    # plt.title("negative image using SLT")
-    #
-    #
-    #
-    # print("g ------------------------------------\n")
-    # thresh = 120 # play with it to see changes
-    # lena = cv2.imread(r"Images\\RealLena.tif")
-    # lena_gray = cv2.cvtColor(lena, cv2.COLOR_BGR2GRAY)
-    # thresh_im = sltThreshold()#add parameters
-    #
-    # plt.figure()
-    # plt.imshow(thresh_im, cmap='gray', vmin=0, vmax=255)
-    # plt.title("thresh image using SLT")
-    #
-    #
-    #
+    print("f ------------------------------------\n")
+    negative_im = sltNegative(dark_img_gray)
+    plt.figure()
+    plt.imshow(negative_im, cmap='gray', vmin=0, vmax=255)
+    plt.title("negative image using SLT")
+    plt.show()
+
+
+    print("g ------------------------------------\n")
+    thresh = 120
+    lena = cv2.imread(r"Images\\RealLena.tif")
+    lena_gray = cv2.cvtColor(lena, cv2.COLOR_BGR2GRAY)
+    thresh_im = sltThreshold(lena_gray, thresh)
+
+    plt.figure()
+    plt.imshow(thresh_im, cmap='gray', vmin=0, vmax=255)
+    plt.title("thresh image using SLT")
+    plt.show()
+
+
     # print("h ------------------------------------\n")
     # im1 = lena_gray
     # im2 = darkimage
