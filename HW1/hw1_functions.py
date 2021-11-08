@@ -1,22 +1,19 @@
-import cv2
+import cv2.cv2 as cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-GRAY_RANGE = 256
+MAX_GRAY_VAL = 255
+
 
 def print_IDs():
-    # print("123456789")
-    print("123456789+987654321\n")
+    print("213991029+213996549\n")
 
 
 def contrastEnhance(im, range):
-    min_gray, max_gray = np.min(im), np.max(im)
-
-    a = (np.max(range) - np.min(range)) / (max_gray - min_gray)
-    b = np.max(range) - a * max_gray
-
-    nim = a * im + b
-    return nim, a, b
+    a = (np.max(range) - np.min(range)) / (im.max() - im.min())
+    b = np.min(range) - im.min() * a
+    nim = np.array(im * a + b)
+    return np.array(nim, dtype=np.uint8), a, b
 
 
 def showMapping(old_range, a, b):
@@ -26,52 +23,64 @@ def showMapping(old_range, a, b):
     y = a * x + b
     plt.figure()
     plt.plot(x, y)
-    plt.xlim([0, 255])
-    plt.ylim([0, 255])
+    plt.xlim([0, MAX_GRAY_VAL])
+    plt.ylim([0, MAX_GRAY_VAL])
     plt.title('contrast enhance mapping')
 
 
 def minkowski2Dist(im1, im2):
     d = 0
-    hist1 = np.histogram(im1, bins=256, range=(0, 255))
-    hist2 = np.histogram(im2, bins=256, range=(0, 255))
 
-    for gray_val in range(256):
-        d += pow(abs(hist1[gray_val] - hist2[gray_val]), 2)
+    hist1 = np.histogram(im1, bins=MAX_GRAY_VAL + 1, range=(0, MAX_GRAY_VAL))[0]
+    hist2 = np.histogram(im2, bins=MAX_GRAY_VAL + 1, range=(0, MAX_GRAY_VAL))[0]
 
-    return pow(d, 0.5)
+    for k in range(MAX_GRAY_VAL + 1):
+        d += np.power(float(np.abs(hist1[k] - hist2[k])), 2)
+
+    return np.power(d, 0.5)
 
 
 def meanSqrDist(im1, im2):
-    return np.sum(np.power(im2.ravel() - im1.ravel(), 2)) / len(im1.ravel())
+    return np.sum(np.power(im2.astype(float).ravel() - im1.astype(float).ravel(), 2)) / len(im1.ravel())
 
 
 def sliceMat(im):
-    slices = np.zeros(np.size(im), 256)
-    flat_im = im.ravel()
+    original_img = im.ravel()
+    slices = np.full((np.size(im.ravel()), MAX_GRAY_VAL + 1), -1)
 
-    for gray_val in (0, 256):
-        slices[:, gray_val] = (flat_im == gray_val)
+    for gray_val in range(0, MAX_GRAY_VAL + 1):
+        slices[:, gray_val] = (original_img == gray_val).transpose()
 
     return slices
 
 
 def SLTmap(im1, im2):
+    TM = np.zeros(MAX_GRAY_VAL + 1)
     slice_mat = sliceMat(im1)
+
+    for gray_val in range(0, MAX_GRAY_VAL + 1):
+        bits_count = float(np.sum(slice_mat[:, gray_val]))
+        if bits_count == 0:
+            TM[gray_val] = 0
+        else:
+            TM[gray_val] = np.sum(slice_mat[:, gray_val] * im2.ravel()) / bits_count
 
     return mapImage(im1, TM), TM
 
-
 def mapImage(im, tm):
-    # TODO: implement fucntion
-    return TMim
+    slice_mat = sliceMat(im)
+    for gray_val in range(0, MAX_GRAY_VAL + 1):
+        new_slice_mat[:, gray_val] = slice_mat[:, int(tm[gray_val])]
+
+    return np.matmul(slice_mat, tm.transpose()).reshape(im.shape)
+
 
 
 def sltNegative(im):
-    # TODO: implement fucntion - one line
-    return nim
+    return mapImage(im, MAX_GRAY_VAL - np.arange(0, MAX_GRAY_VAL + 1))
 
 
 def sltThreshold(im, thresh):
-    # TODO: implement fucntion
-    return nim
+    tone_mapping = np.zeros(MAX_GRAY_VAL + 1)
+    tone_mapping[thresh:] = MAX_GRAY_VAL
+    return mapImage(im, tone_mapping)
