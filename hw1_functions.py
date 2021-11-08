@@ -85,7 +85,7 @@ def mapImage(im, tm):
     new_slice_mat = np.zeros(slice_mat.shape)
 
     for gray_val in range(0, MAX_GRAY_VAL + 1):
-        new_slice_mat[:, int(tm[gray_val])] = slice_mat[:, gray_val]
+        new_slice_mat[:, gray_val] = slice_mat[:, int(tm[gray_val])]
 
     return np.matmul(new_slice_mat, np.arange(MAX_GRAY_VAL + 1)).reshape(im.shape)
 
