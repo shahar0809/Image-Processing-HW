@@ -1,12 +1,16 @@
 from hw2_functions import *
+import os
 
 if __name__ == "__main__":
     # Read images from folder
-    path_image = r'C:\dev\Image-Processing-HW\HW2\FaceImages\Face1.tif'
+    dir_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), r"FaceImages")
+    print(dir_path)
+
+    path_image = os.path.join(dir_path, "Face1.tif")
     face_img1 = cv2.imread(path_image)
     face_img1_gray = cv2.cvtColor(face_img1, cv2.COLOR_BGR2GRAY)
 
-    path_image = r'C:\dev\Image-Processing-HW\HW2\FaceImages\Face2.tif'
+    path_image = os.path.join(dir_path, "Face2.tif")
     face_img2 = cv2.imread(path_image)
     face_img2 = cv2.cvtColor(face_img2, cv2.COLOR_BGR2GRAY)
 
