@@ -15,5 +15,7 @@ if __name__ == "__main__":
     imagePts1 = np.load("varName1.npy")
     imagePts2 = np.load("varName2.npy")
 
-    findAffineTransform(imagePts1, imagePts2)
+    t = findAffineTransform(imagePts1, imagePts2)
     findProjectiveTransform(imagePts1, imagePts2)
+
+    mapImage(imagePts1, t, (2, 3))

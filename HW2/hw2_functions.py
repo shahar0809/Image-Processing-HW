@@ -25,13 +25,25 @@ def writeMorphingVideo(image_list, video_name):
 def mapImage(im, T, sizeOutIm):
     im_new = np.zeros(sizeOutIm)
 
-    # create meshgrid of all coordinates in new image [x,y]
+    # create mesh grid of all coordinates in new image [x,y]
+    xx, yy = np.meshgrid(list(range(sizeOutIm[0])), list(range(sizeOutIm[1])))
+    xy = np.vstack([xx.ravel(), yy.ravel()])
+    print(xy)
 
     # add homogenous coord [x,y,1]
+    homogeneous_xy = np.vstack([xy, np.array([1] * xx.ravel().size)])
+    print(homogeneous_xy)
 
     # calculate source coordinates that correspond to [x,y,1] in new image
+    print(T)
+    print(np.linalg.inv(T))
+    source_coordinates = np.matmul(np.linalg.inv(T), homogeneous_xy)
+    print(source_coordinates)
+
+    """np.vstack([source_coordinates[0][:] < 0 && source_coordinates[0][:] > 255, my_2d_array[1][:] > 2])"""
 
     # find coordinates outside range and delete (in source and target)
+    inside_range = np.delete(source_coordinates, 2, 1)
 
     # interpolate - bilinear
 
