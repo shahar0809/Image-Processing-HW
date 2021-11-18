@@ -10,45 +10,50 @@ def writeMorphingVideo(image_list, video_name):
     out.release()
 
 
-# def createMorphSequence(im1, im1_pts, im2, im2_pts, t_list, transformType):
-#     if transformType:
-#     # TODO: projective transforms
-#     else:
-#     # TODO: affine transforms
-#     ims = []
-#     for t in t_list:
-#         # TODO: calculate nim for each t
-#         ims.append(nim)
-#     return ims
+def createMorphSequence(im1, im1_pts, im2, im2_pts, t_list, transformType):
+    if transformType:
+        T12 = findProjectiveTransform(im1_pts, im2_pts)
+        T21 = findProjectiveTransform(im2_pts, im1_pts)
+    else:
+        T12 = findAffineTransform(im1_pts, im2_pts)
+        T21 = findAffineTransform(im2_pts, im1_pts)
+    ims = []
+    for t in t_list:
+        T12_t = np.multiply(1 - t, np.identity(3)) + np.multiply(t, T12)
+        T21_1_t = np.multiply((1 - t) * t, T21) + np.multiply(t, np.identity(3))
+        newIm1 = mapImage(im1, T12_t, im1.shape)
+        newIm2 = mapImage(im2, T21_1_t, im1.shape)
+        nim = (np.multiply(1 - t, newIm1) + np.multiply(t, newIm2)).reshape(im1.shape)
+        ims.append(nim)
+    return ims
 
 
 def mapImage(im, T, sizeOutIm):
     im_new = np.zeros(sizeOutIm)
 
     # create mesh grid of all coordinates in new image [x,y]
-    xx, yy = np.meshgrid(list(range(sizeOutIm[0])), list(range(sizeOutIm[1])))
+    xx, yy = np.meshgrid(list(range(sizeOutIm[1])), list(range(sizeOutIm[0])))
     xy = np.vstack([xx.ravel(), yy.ravel()])
-    print(xy)
 
     # add homogenous coord [x,y,1]
     homogeneous_xy = np.vstack([xy, np.array([1] * xx.ravel().size)])
-    print(homogeneous_xy)
 
     # calculate source coordinates that correspond to [x,y,1] in new image
-    print(T)
-    print(np.linalg.inv(T))
     source_coordinates = np.matmul(np.linalg.inv(T), homogeneous_xy)
     print(source_coordinates)
 
-    """np.vstack([source_coordinates[0][:] < 0 && source_coordinates[0][:] > 255, my_2d_array[1][:] > 2])"""
-
     # find coordinates outside range and delete (in source and target)
-    inside_range = np.delete(source_coordinates, 2, 1)
+    outside_range_bool_array = np.vstack(
+        [np.any([source_coordinates[0] < 0, source_coordinates[0] > im.shape[1] - 1], axis=0),
+         np.any([source_coordinates[1] < 0, source_coordinates[1] > im.shape[0] - 1], axis=0)])
+    only_inside_range = np.delete(source_coordinates, np.argwhere(np.any(outside_range_bool_array, axis=0)), 1)
 
     # interpolate - bilinear
 
     # apply corresponding coordinates
     # new_im [ target coordinates ] = old_im [ source coordinates ]
+
+    return im_new.reshape(sizeOutIm)
 
 
 def findProjectiveTransform(pointsSet1, pointsSet2):
