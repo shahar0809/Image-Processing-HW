@@ -23,31 +23,32 @@ if __name__ == "__main__":
     # mapImage(imagePts1, t, (2, 3))
 
     # Read images from folder
-    dir_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), r"FaceImages")
+    dir_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "FaceImages")
     print(dir_path)
 
     path_image = os.path.join(dir_path, "Face1.tif")
-    face_img1 = cv2.imread(path_image)
+    print(path_image)
+    face_img1 = cv2.imread("FaceImages\Face1.tif")
     face_img1_gray = cv2.cvtColor(face_img1, cv2.COLOR_BGR2GRAY)
 
     path_image = os.path.join(dir_path, "Face2.tif")
-    face_img2 = cv2.imread(path_image)
+    face_img2 = cv2.imread("FaceImages\Face2.tif")
     face_img2_gray = cv2.cvtColor(face_img2, cv2.COLOR_BGR2GRAY)
 
     path_image = os.path.join(dir_path, "Face3.tif")
-    section_b_img1 = cv2.imread(path_image)
+    section_b_img1 = cv2.imread("FaceImages\Face3.tif")
     section_b_img1_gray = cv2.cvtColor(section_b_img1, cv2.COLOR_BGR2GRAY)
 
     path_image = os.path.join(dir_path, "Face4.tif")
-    section_b_img2 = cv2.imread(path_image)
+    section_b_img2 = cv2.imread("FaceImages\Face4.tif")
     section_b_img2_gray = cv2.cvtColor(section_b_img2, cv2.COLOR_BGR2GRAY)
 
     getImagePts(face_img1, face_img2, "section_a1", "section_a2", 12)
     getImagePts(face_img1, face_img2, "section_b1", "section_b2", 12)
-    getImagePts(face_img1, face_img2, "section_c1_1_small", "section_c2_1_small", 6)
-    getImagePts(face_img1, face_img2, "section_c1_1_large", "section_c2_1_large", 12)
-    getImagePts(face_img1, face_img2, "section_c1_2_distributed", "section_c2_2_distributed", 12)
-    getImagePts(face_img1, face_img2, "section_c1_2_focused", "section_c2_2_focused", 12)
+    # getImagePts(face_img1, face_img2, "section_c1_1_small", "section_c2_1_small", 6)
+    # getImagePts(face_img1, face_img2, "section_c1_1_large", "section_c2_1_large", 12)
+    # getImagePts(face_img1, face_img2, "section_c1_2_distributed", "section_c2_2_distributed", 12)
+    # getImagePts(face_img1, face_img2, "section_c1_2_focused", "section_c2_2_focused", 12)
 
     """section a"""
 

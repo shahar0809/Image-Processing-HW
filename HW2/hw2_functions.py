@@ -47,8 +47,28 @@ def mapImage(im, T, sizeOutIm):
         [np.any([source_coordinates[0] < 0, source_coordinates[0] > im.shape[1] - 1], axis=0),
          np.any([source_coordinates[1] < 0, source_coordinates[1] > im.shape[0] - 1], axis=0)])
     only_inside_range = np.delete(source_coordinates, np.argwhere(np.any(outside_range_bool_array, axis=0)), 1)
+    print(only_inside_range)
+
+    x_left = np.floor(only_inside_range[0])
+    x_right = np.ceil(only_inside_range[0])
+    y_top = np.floor(only_inside_range[1])
+    y_bottom = np.ceil(only_inside_range[1])
+
+    upper_left = [x_left, y_top]
+    upper_right = [x_right, y_top]
+    bottom_left = [x_left, y_bottom]
+    bottom_right = [x_right, y_bottom]
+
+    deltaX = only_inside_range[0] - x_left
+    deltaY = only_inside_range[1] - y_top
+
+    upper_x = deltaX * upper_left + (1 - deltaX) * upper_right
+    bottom_x = deltaX * bottom_left + (1 - deltaX) * bottom_right
+    im_new = deltaY * upper_x + (1 - deltaY) * bottom_x
 
     # interpolate - bilinear
+    # for x, y in range(sizeOutIm[0]), range(sizeOutIm[1]):
+    #     im_new[x][y] =
 
     # apply corresponding coordinates
     # new_im [ target coordinates ] = old_im [ source coordinates ]
@@ -88,7 +108,7 @@ def findAffineTransform(pointsSet1, pointsSet2):
     new_points_list_x1 = list()
     new_points_list_x2 = list()
 
-    # iterate iver points to create x , x'
+    # iterate over points to create x , x'
     for i in range(0, N):
         new_points_list_x1.append([pointsSet1[0][i], pointsSet1[1][i], 0, 0, 1, 0])
         new_points_list_x1.append([0, 0, pointsSet1[0][i], pointsSet1[1][i], 0, 1])
