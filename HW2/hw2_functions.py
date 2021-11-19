@@ -69,7 +69,7 @@ def mapImage(im, T, sizeOutIm):
 
     # apply corresponding coordinates
     flat_new_im = im_new.ravel()
-    flat_new_im[np.argwhere((np.any(np.logical_not(outside_range_bool_array), axis=0)))] = temp_im[list(range(temp_im.shape[0]))]
+    flat_new_im[(np.argwhere(np.logical_not(np.any(outside_range_bool_array, axis=0)))).transpose()] = temp_im[list(range(temp_im.shape[0]))]
 
     # new_im [ target coordinates ] = old_im [ source coordinates ]
 
