@@ -43,8 +43,8 @@ if __name__ == "__main__":
     section_b_img2 = cv2.imread("FaceImages\Face4.tif")
     section_b_img2_gray = cv2.cvtColor(section_b_img2, cv2.COLOR_BGR2GRAY)
 
-    getImagePts(face_img1, face_img2, "section_a1", "section_a2", 12)
-    getImagePts(face_img1, face_img2, "section_b1", "section_b2", 12)
+    getImagePts(face_img1, face_img2, "section_a1", "section_a2", 4)
+    #getImagePts(face_img1, face_img2, "section_b1", "section_b2", 4)
     # getImagePts(face_img1, face_img2, "section_c1_1_small", "section_c2_1_small", 6)
     # getImagePts(face_img1, face_img2, "section_c1_1_large", "section_c2_1_large", 12)
     # getImagePts(face_img1, face_img2, "section_c1_2_distributed", "section_c2_2_distributed", 12)

@@ -20,7 +20,7 @@ def createMorphSequence(im1, im1_pts, im2, im2_pts, t_list, transformType):
     ims = []
     for t in t_list:
         T12_t = np.multiply(1 - t, np.identity(3)) + np.multiply(t, T12)
-        T21_1_t = np.multiply((1 - t) * t, T21) + np.multiply(t, np.identity(3))
+        T21_1_t = np.multiply((1 - t), T21) + np.multiply(t, np.identity(3))
         newIm1 = mapImage(im1, T12_t, im1.shape)
         newIm2 = mapImage(im2, T21_1_t, im1.shape)
         nim = (np.multiply(1 - t, newIm1) + np.multiply(t, newIm2)).reshape(im1.shape)
@@ -40,40 +40,41 @@ def mapImage(im, T, sizeOutIm):
 
     # calculate source coordinates that correspond to [x,y,1] in new image
     source_coordinates = np.matmul(np.linalg.inv(T), homogeneous_xy)
-    print(source_coordinates)
+    #print(source_coordinates)
 
     # find coordinates outside range and delete (in source and target)
     outside_range_bool_array = np.vstack(
         [np.any([source_coordinates[0] < 0, source_coordinates[0] > im.shape[1] - 1], axis=0),
          np.any([source_coordinates[1] < 0, source_coordinates[1] > im.shape[0] - 1], axis=0)])
     only_inside_range = np.delete(source_coordinates, np.argwhere(np.any(outside_range_bool_array, axis=0)), 1)
-    print(only_inside_range)
+    #print(only_inside_range)
 
-    x_left = np.floor(only_inside_range[0])
-    x_right = np.ceil(only_inside_range[0])
-    y_top = np.floor(only_inside_range[1])
-    y_bottom = np.ceil(only_inside_range[1])
-
-    upper_left = [x_left, y_top]
-    upper_right = [x_right, y_top]
-    bottom_left = [x_left, y_bottom]
-    bottom_right = [x_right, y_bottom]
-
-    deltaX = only_inside_range[0] - x_left
-    deltaY = only_inside_range[1] - y_top
-
-    upper_x = deltaX * upper_left + (1 - deltaX) * upper_right
-    bottom_x = deltaX * bottom_left + (1 - deltaX) * bottom_right
-    im_new = deltaY * upper_x + (1 - deltaY) * bottom_x
+    x_left = np.floor(only_inside_range[1])
+    x_right = np.ceil(only_inside_range[1])
+    y_top = np.floor(only_inside_range[0])
+    y_bottom = np.ceil(only_inside_range[0])
 
     # interpolate - bilinear
-    # for x, y in range(sizeOutIm[0]), range(sizeOutIm[1]):
-    #     im_new[x][y] =
+    # upper_left = np.vstack([x_left, y_top])
+    # upper_right = np.vstack([x_right, y_top])
+    # bottom_left = np.vstack([x_left, y_bottom])
+    # bottom_right = np.vstack([x_right, y_bottom])
+
+    deltaX = only_inside_range[1] - x_left
+    deltaY = only_inside_range[0] - y_top
+
+    upper_x = np.multiply(deltaX, im[x_left.astype(int), y_top.astype(int)]) + np.multiply((1 - deltaX), im[x_right.astype(int), y_top.astype(int)])
+    bottom_x = np.multiply(deltaX, im[x_left.astype(int), y_bottom.astype(int)]) + np.multiply((1 - deltaX), im[x_right.astype(int), y_bottom.astype(int)])
+    temp_im = np.multiply(deltaY, upper_x) + np.multiply((1 - deltaY), bottom_x)
 
     # apply corresponding coordinates
+    flat_new_im = im_new.ravel()
+    flat_new_im[np.argwhere((np.any(np.logical_not(outside_range_bool_array), axis=0)))] = temp_im[list(range(temp_im.shape[0]))]
+
     # new_im [ target coordinates ] = old_im [ source coordinates ]
 
-    return im_new.reshape(sizeOutIm)
+
+    return flat_new_im.reshape(sizeOutIm)
 
 
 def findProjectiveTransform(pointsSet1, pointsSet2):
