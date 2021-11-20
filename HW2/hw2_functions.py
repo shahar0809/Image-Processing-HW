@@ -4,7 +4,7 @@ import numpy as np
 
 
 def writeMorphingVideo(image_list, video_name):
-    out = cv2.VideoWriter(video_name + ".mp4", cv2.VideoWriter_fourcc(*'MP4V'), 20.0, image_list[0].shape, 0)
+    out = cv2.VideoWriter(video_name + ".mp4", cv2.VideoWriter_fourcc(*'mp4v'), 20.0, image_list[0].shape, 0)
     for im in image_list:
         out.write(im)
     out.release()
@@ -20,11 +20,16 @@ def createMorphSequence(im1, im1_pts, im2, im2_pts, t_list, transformType):
     ims = []
     for t in t_list:
         T12_t = np.multiply(1 - t, np.identity(3)) + np.multiply(t, T12)
-        T21_1_t = np.multiply((1 - t), T21) + np.multiply(t, np.identity(3))
+        T21_1_t = np.multiply(1 - t, T21) + np.multiply(t, np.identity(3))
         newIm1 = mapImage(im1, T12_t, im1.shape)
         newIm2 = mapImage(im2, T21_1_t, im1.shape)
         nim = (np.multiply(1 - t, newIm1) + np.multiply(t, newIm2)).reshape(im1.shape)
-        ims.append(nim)
+        ims.append(np.uint8(nim))
+
+    # for image in ims:
+    #     plt.figure()
+    #     plt.imshow(image, cmap='gray', vmin=0, vmax=255)
+    #     plt.show()
     return ims
 
 
@@ -63,16 +68,24 @@ def mapImage(im, T, sizeOutIm):
     deltaX = only_inside_range[1] - x_left
     deltaY = only_inside_range[0] - y_top
 
-    upper_x = np.multiply(deltaX, im[x_left.astype(int), y_top.astype(int)]) + np.multiply((1 - deltaX), im[x_right.astype(int), y_top.astype(int)])
-    bottom_x = np.multiply(deltaX, im[x_left.astype(int), y_bottom.astype(int)]) + np.multiply((1 - deltaX), im[x_right.astype(int), y_bottom.astype(int)])
+    upper_x = np.multiply(deltaX, im[x_left.astype(int), y_top.astype(int)]) + np.multiply((1 - deltaX), im[
+        x_right.astype(int), y_top.astype(int)])
+    bottom_x = np.multiply(deltaX, im[x_left.astype(int), y_bottom.astype(int)]) + np.multiply((1 - deltaX), im[
+        x_right.astype(int), y_bottom.astype(int)])
     temp_im = np.multiply(deltaY, upper_x) + np.multiply((1 - deltaY), bottom_x)
+
+    # upper_x = np.multiply(deltaX, im[np.uint8(x_left), np.uint8(y_top)]) + np.multiply((1 - deltaX), im[
+    #     np.uint8(x_right), np.uint8(y_top)])
+    # bottom_x = np.multiply(deltaX, im[np.uint8(x_left), np.uint8(y_bottom)]) + np.multiply((1 - deltaX), im[
+    #     np.uint8(x_right), np.uint8(y_bottom)])
+    # temp_im = np.multiply(deltaY, upper_x) + np.multiply((1 - deltaY), bottom_x)
 
     # apply corresponding coordinates
     flat_new_im = im_new.ravel()
-    flat_new_im[(np.argwhere(np.logical_not(np.any(outside_range_bool_array, axis=0)))).transpose()] = temp_im[list(range(temp_im.shape[0]))]
-
-    # new_im [ target coordinates ] = old_im [ source coordinates ]
-
+    # for position, index in enumerate(list(np.argwhere(np.logical_not(np.any(outside_range_bool_array, axis=0))))):
+    #     flat_new_im[index] = temp_im[position]
+    flat_new_im[(np.argwhere(np.logical_not(np.any(outside_range_bool_array, axis=0)))).transpose()] = temp_im[
+        list(range(temp_im.shape[0]))]
 
     return flat_new_im.reshape(sizeOutIm)
 
@@ -99,9 +112,13 @@ def findProjectiveTransform(pointsSet1, pointsSet2):
     x1_matrix = np.array(new_points_list_x1)
     x2_matrix = np.array(new_points_list_x2)
 
-    affine_parameters = np.vstack([np.matmul(np.linalg.pinv(x1_matrix), x2_matrix), [1]])
-    T = affine_parameters.reshape((3, 3))
-    return T
+    projective_parameters = np.vstack([np.matmul(np.linalg.pinv(x1_matrix), x2_matrix), [1]]).reshape((3, 3))
+    c = projective_parameters[0][2]
+    projective_parameters[0][2] = projective_parameters[1][1]
+    projective_parameters[1][1] = projective_parameters[1][0]
+    projective_parameters[1][0] = c
+
+    return projective_parameters
 
 
 def findAffineTransform(pointsSet1, pointsSet2):
@@ -121,6 +138,10 @@ def findAffineTransform(pointsSet1, pointsSet2):
     x2_matrix = np.array(new_points_list_x2)
 
     affine_parameters = np.matmul(np.linalg.pinv(x1_matrix), x2_matrix).reshape((2, 3))
+    c = affine_parameters[0][2]
+    affine_parameters[0][2] = affine_parameters[1][1]
+    affine_parameters[1][1] = affine_parameters[1][0]
+    affine_parameters[1][0] = c
     T = np.vstack([affine_parameters, [0, 0, 1]])
     return T
 
