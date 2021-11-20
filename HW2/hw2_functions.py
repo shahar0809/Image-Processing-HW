@@ -22,7 +22,7 @@ def createMorphSequence(im1, im1_pts, im2, im2_pts, t_list, transformType):
         T12_t = np.multiply(1 - t, np.identity(3)) + np.multiply(t, T12)
         T21_1_t = np.multiply(1 - t, T21) + np.multiply(t, np.identity(3))
         newIm1 = mapImage(im1, T12_t, im1.shape)
-        newIm2 = mapImage(im2, T21_1_t, im2.shape)
+        newIm2 = mapImage(im2, T21_1_t, im1.shape)
         nim = (np.multiply(1 - t, newIm1) + np.multiply(t, newIm2)).reshape(im1.shape)
         ims.append(np.uint8(nim))
 
