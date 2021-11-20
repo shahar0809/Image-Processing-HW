@@ -25,11 +25,6 @@ def createMorphSequence(im1, im1_pts, im2, im2_pts, t_list, transformType):
         newIm2 = mapImage(im2, T21_1_t, im1.shape)
         nim = (np.multiply(1 - t, newIm1) + np.multiply(t, newIm2)).reshape(im1.shape)
         ims.append(np.uint8(nim))
-
-    # for image in ims:
-    #     plt.figure()
-    #     plt.imshow(image, cmap='gray', vmin=0, vmax=255)
-    #     plt.show()
     return ims
 
 
@@ -106,7 +101,6 @@ def findProjectiveTransform(pointsSet1, pointsSet2):
     projective_parameters[0][2] = projective_parameters[1][1]
     projective_parameters[1][1] = projective_parameters[1][0]
     projective_parameters[1][0] = c
-
     return projective_parameters
 
 
