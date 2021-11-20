@@ -22,7 +22,7 @@ def createMorphSequence(im1, im1_pts, im2, im2_pts, t_list, transformType):
         T12_t = np.multiply(1 - t, np.identity(3)) + np.multiply(t, T12)
         T21_1_t = np.multiply(1 - t, T21) + np.multiply(t, np.identity(3))
         newIm1 = mapImage(im1, T12_t, im1.shape)
-        newIm2 = mapImage(im2, T21_1_t, im1.shape)
+        newIm2 = mapImage(im2, T21_1_t, im2.shape)
         nim = (np.multiply(1 - t, newIm1) + np.multiply(t, newIm2)).reshape(im1.shape)
         ims.append(np.uint8(nim))
 
@@ -48,7 +48,6 @@ def mapImage(im, T, sizeOutIm):
     source_coordinates[0] = source_coordinates[0] / source_coordinates[2]
     source_coordinates[1] = source_coordinates[1] / source_coordinates[2]
     source_coordinates = np.delete(source_coordinates, 2, 0)
-    print(source_coordinates)
 
     # find coordinates outside range and delete (in source and target)
     outside_range_bool_array = np.vstack(
@@ -56,7 +55,6 @@ def mapImage(im, T, sizeOutIm):
          np.any([source_coordinates[1] < 0, source_coordinates[1] > im.shape[0] - 1], axis=0)])
 
     only_inside_range = np.delete(source_coordinates, np.argwhere(np.any(outside_range_bool_array, axis=0)), 1)
-    #print(only_inside_range)
 
     x_left = np.floor(only_inside_range[1])
     x_right = np.ceil(only_inside_range[1])
@@ -64,43 +62,17 @@ def mapImage(im, T, sizeOutIm):
     y_bottom = np.ceil(only_inside_range[0])
 
     # interpolate - bilinear
-    # upper_left = np.vstack([x_left, y_top])
-    # upper_right = np.vstack([x_right, y_top])
-    # bottom_left = np.vstack([x_left, y_bottom])
-    # bottom_right = np.vstack([x_right, y_bottom])
-
     deltaX = only_inside_range[1] - x_left
     deltaY = only_inside_range[0] - y_top
 
-    upper_x = np.multiply(deltaX, im[np.uint8(x_right), np.uint8(y_top)]) + np.multiply((1 - deltaX), im[
+    upper_x = np.multiply(deltaX, im[np.uint8(x_right), np.uint8(y_bottom)]) + np.multiply((1 - deltaX), im[
         np.uint8(x_left), np.uint8(y_bottom)])
-    bottom_x = np.multiply(deltaX, im[np.uint8(x_right), np.uint8(y_bottom)]) + np.multiply((1 - deltaX), im[
+    bottom_x = np.multiply(deltaX, im[np.uint8(x_right), np.uint8(y_top)]) + np.multiply((1 - deltaX), im[
         np.uint8(x_left), np.uint8(y_top)])
     temp_im = np.multiply(deltaY, upper_x) + np.multiply((1 - deltaY), bottom_x)
 
-    # upper_x = np.multiply(deltaX, im[x_right.astype(int), y_top.astype(int)]) + np.multiply((1 - deltaX), im[
-    #     x_left.astype(int), y_bottom.astype(int)])
-    # bottom_x = np.multiply(deltaX, im[x_right.astype(int), y_bottom.astype(int)]) + np.multiply((1 - deltaX), im[
-    #     x_left.astype(int), y_top.astype(int)])
-    # temp_im = np.multiply(deltaY, upper_x) + np.multiply((1 - deltaY), bottom_x)
-
-    # upper_x = np.multiply(deltaY, im[x_left.astype(int), y_top.astype(int)]) + np.multiply((1 - deltaY), im[
-    #     x_right.astype(int), y_top.astype(int)])
-    # bottom_x = np.multiply(deltaY, im[x_left.astype(int), y_bottom.astype(int)]) + np.multiply((1 - deltaY), im[
-    #     x_right.astype(int), y_bottom.astype(int)])
-    # temp_im = np.multiply(deltaX, upper_x) + np.multiply((1 - deltaX), bottom_x)
-
-
-    # upper_x = np.multiply(deltaX, im[np.uint8(x_left), np.uint8(y_top)]) + np.multiply((1 - deltaX), im[
-    #     np.uint8(x_right), np.uint8(y_top)])
-    # bottom_x = np.multiply(deltaX, im[np.uint8(x_left), np.uint8(y_bottom)]) + np.multiply((1 - deltaX), im[
-    #     np.uint8(x_right), np.uint8(y_bottom)])
-    # temp_im = np.multiply(deltaY, upper_x) + np.multiply((1 - deltaY), bottom_x)
-
     # apply corresponding coordinates
     flat_new_im = im_new.ravel()
-    # for position, index in enumerate(list(np.argwhere(np.logical_not(np.any(outside_range_bool_array, axis=0))))):
-    #     flat_new_im[index] = temp_im[position]
     flat_new_im[(np.argwhere(np.logical_not(np.any(outside_range_bool_array, axis=0)))).transpose()] = temp_im[
         list(range(temp_im.shape[0]))]
 
