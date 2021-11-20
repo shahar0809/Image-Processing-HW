@@ -23,28 +23,20 @@ if __name__ == "__main__":
     # mapImage(imagePts1, t, (2, 3))
 
     # Read images from folder
-    dir_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "FaceImages")
-    print(dir_path)
-
-    path_image = os.path.join(dir_path, "Face1.tif")
-    print(path_image)
     face_img1 = cv2.imread("FaceImages\Face5.tif")
     face_img1_gray = cv2.cvtColor(face_img1, cv2.COLOR_BGR2GRAY)
 
-    path_image = os.path.join(dir_path, "Face2.tif")
     face_img2 = cv2.imread("FaceImages\Face6.tif")
     face_img2_gray = cv2.cvtColor(face_img2, cv2.COLOR_BGR2GRAY)
 
-    path_image = os.path.join(dir_path, "Face3.tif")
-    section_b_img1 = cv2.imread("FaceImages\Face3.tif")
-    section_b_img1_gray = cv2.cvtColor(section_b_img1, cv2.COLOR_BGR2GRAY)
-
-    path_image = os.path.join(dir_path, "Face4.tif")
-    section_b_img2 = cv2.imread("FaceImages\Face4.tif")
+    section_b_img1 = cv2.imread("our_images\First_image.jpeg")
+    # section_b_img1_gray = cv2.cvtColor(section_b_img1, cv2.COLOR_BGR2GRAY)
+    #
+    section_b_img2 = cv2.imread("our_images\Secend_image.jpeg")
     section_b_img2_gray = cv2.cvtColor(section_b_img2, cv2.COLOR_BGR2GRAY)
 
     # getImagePts(face_img1, face_img2, "section_a1", "section_a2", 12)
-    # getImagePts(face_img1, face_img2, "section_b1", "section_b2", 4)
+    # getImagePts(section_b_img1, section_b_img2, "section_b1", "section_b2", 12)
     # getImagePts(face_img1, face_img2, "section_c1_1_small", "section_c2_1_small", 6)
     # getImagePts(face_img1, face_img2, "section_c1_1_large", "section_c2_1_large", 12)
     # getImagePts(face_img1, face_img2, "section_c1_2_distributed", "section_c2_2_distributed", 12)
@@ -68,11 +60,11 @@ if __name__ == "__main__":
 
     # affine transformation
     affine_transform = findAffineTransform(section_b1_pts, section_b2_pts)
-    affine_image = mapImage(section_b_img1_gray, affine_transform, section_b_img1_gray.shape)
+    affine_image = mapImage(section_b_img1, affine_transform, section_b_img1.shape)
 
     # projective transformation
     projective_transform = findProjectiveTransform(section_b1_pts, section_b2_pts)
-    projective_image = mapImage(section_b_img2_gray, projective_transform, section_b_img2_gray.shape)
+    projective_image = mapImage(section_b_img2, projective_transform, section_b_img2.shape)
 
     # then display
     plt.figure()

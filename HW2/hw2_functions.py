@@ -45,12 +45,16 @@ def mapImage(im, T, sizeOutIm):
 
     # calculate source coordinates that correspond to [x,y,1] in new image
     source_coordinates = np.matmul(np.linalg.inv(T), homogeneous_xy)
-    #print(source_coordinates)
+    source_coordinates[0] = source_coordinates[0] / source_coordinates[2]
+    source_coordinates[1] = source_coordinates[1] / source_coordinates[2]
+    source_coordinates = np.delete(source_coordinates, 2, 0)
+    print(source_coordinates)
 
     # find coordinates outside range and delete (in source and target)
     outside_range_bool_array = np.vstack(
         [np.any([source_coordinates[0] < 0, source_coordinates[0] > im.shape[1] - 1], axis=0),
          np.any([source_coordinates[1] < 0, source_coordinates[1] > im.shape[0] - 1], axis=0)])
+
     only_inside_range = np.delete(source_coordinates, np.argwhere(np.any(outside_range_bool_array, axis=0)), 1)
     #print(only_inside_range)
 
@@ -68,11 +72,24 @@ def mapImage(im, T, sizeOutIm):
     deltaX = only_inside_range[1] - x_left
     deltaY = only_inside_range[0] - y_top
 
-    upper_x = np.multiply(deltaX, im[x_left.astype(int), y_top.astype(int)]) + np.multiply((1 - deltaX), im[
-        x_right.astype(int), y_top.astype(int)])
-    bottom_x = np.multiply(deltaX, im[x_left.astype(int), y_bottom.astype(int)]) + np.multiply((1 - deltaX), im[
-        x_right.astype(int), y_bottom.astype(int)])
+    upper_x = np.multiply(deltaX, im[np.uint8(x_right), np.uint8(y_top)]) + np.multiply((1 - deltaX), im[
+        np.uint8(x_left), np.uint8(y_bottom)])
+    bottom_x = np.multiply(deltaX, im[np.uint8(x_right), np.uint8(y_bottom)]) + np.multiply((1 - deltaX), im[
+        np.uint8(x_left), np.uint8(y_top)])
     temp_im = np.multiply(deltaY, upper_x) + np.multiply((1 - deltaY), bottom_x)
+
+    # upper_x = np.multiply(deltaX, im[x_right.astype(int), y_top.astype(int)]) + np.multiply((1 - deltaX), im[
+    #     x_left.astype(int), y_bottom.astype(int)])
+    # bottom_x = np.multiply(deltaX, im[x_right.astype(int), y_bottom.astype(int)]) + np.multiply((1 - deltaX), im[
+    #     x_left.astype(int), y_top.astype(int)])
+    # temp_im = np.multiply(deltaY, upper_x) + np.multiply((1 - deltaY), bottom_x)
+
+    # upper_x = np.multiply(deltaY, im[x_left.astype(int), y_top.astype(int)]) + np.multiply((1 - deltaY), im[
+    #     x_right.astype(int), y_top.astype(int)])
+    # bottom_x = np.multiply(deltaY, im[x_left.astype(int), y_bottom.astype(int)]) + np.multiply((1 - deltaY), im[
+    #     x_right.astype(int), y_bottom.astype(int)])
+    # temp_im = np.multiply(deltaX, upper_x) + np.multiply((1 - deltaX), bottom_x)
+
 
     # upper_x = np.multiply(deltaX, im[np.uint8(x_left), np.uint8(y_top)]) + np.multiply((1 - deltaX), im[
     #     np.uint8(x_right), np.uint8(y_top)])
