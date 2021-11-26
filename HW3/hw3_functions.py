@@ -9,17 +9,19 @@ MAX_GRAY_VAL = 256
 
 
 def addSPnoise(im, p):
+    row, col = im.shape
     sp_noise_im = im.copy()
+    num_noise_pixels = p * row * col
+
     # Generate random indexes for white and black pixels
-    white_pixels_x = random.sample(range(MAX_GRAY_VAL), int(p / 2))
-    white_pixels_y = random.sample(range(MAX_GRAY_VAL), int(p / 2))
-    black_pixels_x = random.sample(range(MAX_GRAY_VAL), int(p / 2))
-    black_pixels_y = random.sample(range(MAX_GRAY_VAL), int(p / 2))
+    white_pixels_x = random.sample(range(row * col), int(num_noise_pixels / 2))
+    black_pixels_x = random.sample(range(row * col), int(num_noise_pixels / 2))
 
     # Assign white and black values
-    sp_noise_im[white_pixels_x, white_pixels_y] = MAX_GRAY_VAL
-    sp_noise_im[black_pixels_x, black_pixels_y] = 0
-    return sp_noise_im
+    sp_noise_im.ravel()[white_pixels_x] = 255
+    sp_noise_im.ravel()[black_pixels_x] = 0
+
+    return sp_noise_im.reshape(im.shape)
 
 
 def addGaussianNoise(im, s):

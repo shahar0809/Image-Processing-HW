@@ -7,7 +7,7 @@ if __name__ == "__main__":
 
     # 1 ----------------------------------------------------------
     # add salt and pepper noise - low
-    lena_sp_low = addSPnoise(lena_gray, 400)
+    lena_sp_low = addSPnoise(lena_gray, 0.5)
 
     # add parameters to functions cleanImageMedian, cleanImageMean, bilateralFilt
     plt.figure()
