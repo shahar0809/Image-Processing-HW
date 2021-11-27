@@ -1,8 +1,6 @@
-import numpy as np
-import cv2.cv2 as cv2
 import random
-import matplotlib.pyplot as plt
-from scipy.signal import convolve2d
+
+import numpy as np
 
 # Constants
 MAX_GRAY_VAL = 256
@@ -25,9 +23,9 @@ def addSPnoise(im, p):
 
 
 def addGaussianNoise(im, s):
-    gaussian_noise_im = im.copy()
-    # TODO: add implementation
-    return gaussian_noise_im
+    noisy_image = im.copy()
+    noisy_image = np.add(noisy_image, np.random.normal(0, s, im.shape))
+    return noisy_image
 
 
 def cleanImageMedian(im, radius):

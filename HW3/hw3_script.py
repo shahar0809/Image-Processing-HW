@@ -55,16 +55,16 @@ if __name__ == "__main__":
     #
     # # 3 ----------------------------------------------------------
     # # add gaussian noise - low
-    # lena_gaussian = addGaussianNoise() # TODO - add low noise
-    #
-    # # add parameters to functions cleanImageMedian, cleanImageMean, bilateralFilt
-    # plt.figure()
-    # plt.subplot(2, 3, 1)
-    # plt.imshow(lena_gray, cmap='gray', vmin=0, vmax=255)
-    # plt.title("original")
-    # plt.subplot(2, 3, 2)
-    # plt.imshow(lena_gaussian, cmap='gray', vmin=0, vmax=255)
-    # plt.title("gaussian noise - low")
+    lena_gaussian = addGaussianNoise(lena_gray, 50) # TODO - add low noise
+
+    # add parameters to functions cleanImageMedian, cleanImageMean, bilateralFilt
+    plt.figure()
+    plt.subplot(2, 3, 1)
+    plt.imshow(lena_gray, cmap='gray', vmin=0, vmax=255)
+    plt.title("original")
+    plt.subplot(2, 3, 2)
+    plt.imshow(lena_gaussian, cmap='gray', vmin=0, vmax=255)
+    plt.title("gaussian noise - low")
     # plt.subplot(2, 3, 4)
     # plt.imshow(cleanImageMedian(), cmap='gray', vmin=0, vmax=255)
     # plt.title("median")
