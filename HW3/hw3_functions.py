@@ -29,8 +29,8 @@ def addGaussianNoise(im, s):
 
 def cleanImageMedian(im, radius):
     median_im = im.copy()
-    for row in range(radius, im.shape[1] - radius):
-        for col in range(radius, im.shape[0] - radius):
+    for row in range(radius, im.shape[0] - radius):
+        for col in range(radius, im.shape[1] - radius):
             filtering_mask = np.take(np.take(median_im, range(row - radius, row + radius + 1), 0),
                                      range(col - radius, col + radius + 1), 1)
             median_im[row][col] = np.median(filtering_mask)
@@ -52,5 +52,12 @@ def cleanImageMean(im, radius, maskSTD):
 
 def bilateralFilt(im, radius, stdSpatial, stdIntensity):
     bilateral_im = im.copy()
-    # TODO: add implementation
+    # for i in range(radius, im.shape[0] - radius):
+    #     for j in range(radius, im.shape[1] - radius):
+    #         # xx, yy = np.meshgrid(list(range(i - radius, i + radius + 1)), list(range(j - radius, j + radius + 1)))
+    #         # xy = np.vstack([xx.ravel(), yy.ravel()])
+    #         window = np.take(np.take(im, range(i - radius, i + radius + 1), 0), range(j - radius, j + radius + 1), 1)
+    #         gi = math.exp(-((math.pow(window- im[i][j], 2)) / (2 * stdIntensity ** 2)))
+    #         gs = math.exp(-((math.pow(xx - i, 2) + math.pow(yy - j, 2)) / (2 * stdSpatial ** 2)))
+    #         bilateral_im[i][j] = np.sum(np.multiply(gi, gs, window)) / np.sum(np.multiply(gi, gs))
     return bilateral_im

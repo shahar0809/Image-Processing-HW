@@ -26,9 +26,9 @@ if __name__ == "__main__":
     plt.subplot(2, 3, 5)
     plt.imshow(cleanImageMean(lena_sp_low, 2, 8), cmap='gray', vmin=0, vmax=255)
     plt.title("mean")
-    # plt.subplot(2, 3, 6)
-    # plt.imshow(bilateralFilt(), cmap='gray', vmin=0, vmax=255)
-    # plt.title("bilateral")
+    plt.subplot(2, 3, 6)
+    plt.imshow(bilateralFilt(lena_sp_low, 1, 8, 10), cmap='gray', vmin=0, vmax=255)
+    plt.title("bilateral")
 
     print("Conclusions -----  TODO: add explanation\n")
 
@@ -50,9 +50,9 @@ if __name__ == "__main__":
     plt.subplot(2, 3, 5)
     plt.imshow(cleanImageMean(lena_sp_high, 2, 8), cmap='gray', vmin=0, vmax=255)
     plt.title("mean")
-    # plt.subplot(2, 3, 6)
-    # plt.imshow(bilateralFilt(), cmap='gray', vmin=0, vmax=255)
-    # plt.title("bilateral")
+    plt.subplot(2, 3, 6)
+    plt.imshow(bilateralFilt(lena_sp_high, 1, 8, 10), cmap='gray', vmin=0, vmax=255)
+    plt.title("bilateral")
 
     print("Conclusions -----  TODO: add explanation \n")
 
@@ -74,9 +74,9 @@ if __name__ == "__main__":
     plt.subplot(2, 3, 5)
     plt.imshow(cleanImageMean(lena_gaussian, 2, 20), cmap='gray', vmin=0, vmax=255)
     plt.title("mean")
-    # plt.subplot(2, 3, 6)
-    # plt.imshow(bilateralFilt(), cmap='gray', vmin=0, vmax=255)
-    # plt.title("bilateral")
+    plt.subplot(2, 3, 6)
+    plt.imshow(bilateralFilt(lena_gaussian, 1, 8, 20), cmap='gray', vmin=0, vmax=255)
+    plt.title("bilateral")
 
     print("Conclusions -----  TODO: add explanation \n")
 
@@ -98,9 +98,9 @@ if __name__ == "__main__":
     plt.subplot(2, 3, 5)
     plt.imshow(cleanImageMean(lena_gaussian, 2, 70), cmap='gray', vmin=0, vmax=255)
     plt.title("mean")
-    # plt.subplot(2, 3, 6)
-    # plt.imshow(bilateralFilt(), cmap='gray', vmin=0, vmax=255)
-    # plt.title("bilateral")
+    plt.subplot(2, 3, 6)
+    plt.imshow(bilateralFilt(lena_gaussian, 1, 8, 70), cmap='gray', vmin=0, vmax=255)
+    plt.title("bilateral")
 
     print("Conclusions -----  TODO: add explanation \n")
 
