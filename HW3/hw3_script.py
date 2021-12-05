@@ -38,9 +38,9 @@ if __name__ == "__main__":
     plt.title("bilateral")
 
     print("Conclusions for ----- salt and pepper low noise")
-    print("The best cleaner is: median.")
-    print("In second place is: mean")
-    print("The last one is: bilateral \n")
+    print("The best cleaner is: median")
+    print("In second place is: bilateral")
+    print("The last one is: mean \n")
 
     # 2 ----------------------------------------------------------
     # add salt and pepper noise - high
@@ -73,8 +73,8 @@ if __name__ == "__main__":
 
     print("Conclusions for ----- salt and pepper high noise")
     print("The best cleaner is: median")
-    print("In second place is: mean")
-    print("The last one is: bilateral \n")
+    print("In second place is: bilateral")
+    print("The last one is: mean\n")
 
     # 3 ----------------------------------------------------------
     # add gaussian noise - low
@@ -140,8 +140,8 @@ if __name__ == "__main__":
     plt.title("bilateral")
 
     print("Conclusions for ----- gaussian high noise")
-    print("The best cleaner is: mean")
-    print("In second place is: bilateral")
+    print("The best cleaner is: bilateral")
+    print("In second place is: mean")
     print("The last one is: median \n")
 
     plt.show()
