@@ -1,6 +1,7 @@
 import math
 import random
-
+import matplotlib.pyplot as plt
+import cv2
 import numpy as np
 from scipy.signal import convolve2d
 
@@ -45,24 +46,22 @@ def cleanImageMean(im, radius, maskSTD):
     cleaned_im = convolve2d(im, gaussian_filter, mode="same")
     return cleaned_im
 
+
 def bilateralFilt(im, radius, stdSpatial, stdIntensity):
     bilateral_im = im.copy()
+
     for x in range(radius, im.shape[0] - radius):
         for y in range(radius, im.shape[1] - radius):
-            window = bilateral_im[x - radius:x + radius + 1, y - radius:y + radius + 1]
+            window = bilateral_im[x - radius:x + radius + 1, y - radius:y + radius + 1].astype(float)
+
+            gi = np.exp(-((window - im[x, y]) ** 2).astype(float) / np.float(2 * (stdIntensity ** 2)))
+            gi = gi / np.sum(gi)
+
             xx, yy = np.meshgrid(list(range(x - radius, x + radius + 1)), list(range(y - radius, y + radius + 1)))
+            gs = (np.exp(-((np.float_power(xx.ravel() - np.full(xx.ravel().shape, x), 2) + np.float_power(
+                yy.ravel() - np.full(yy.ravel().shape, y), 2)) / (2 * stdSpatial ** 2)))).reshape(gi.shape)
+            gs = gs.reshape(gi.shape).astype(float) / np.sum(gs)
 
-            gs = np.exp(-((np.float_power(
-                window.astype(float) - (np.full(window.shape, im[x][y])).astype(float), 2)) / (
-                                  2 * stdIntensity ** 2)))
-            gs = gs / np.sum(gs)
+            bilateral_im[x][y] = np.sum(cv2.multiply(cv2.multiply(gi, gs), window)) / np.sum(cv2.multiply(gi, gs))
 
-            gi = (np.exp(-((np.float_power(xx.ravel() - np.full(xx.ravel().shape, x), 2) + np.float_power(
-                yy.ravel() - np.full(yy.ravel().shape, y), 2)) / (2 * stdSpatial ** 2)))).reshape(gs.shape)
-            gi = gi.reshape(gs.shape) / np.sum(gi)
-
-            bilateral_im[x][y] = np.sum(np.matmul(gi.astype(float), np.matmul(gs.astype(float), window))) / np.sum(
-                np.matmul(gi.astype(float), gs.astype(float)))
-
-    print(np.sum(im), np.sum(bilateral_im))
-    return bilateral_im
+    return bilateral_im.astype(np.uint8)
