@@ -1,11 +1,5 @@
-import numpy as np
-from scipy.signal import convolve2d
-import matplotlib.pyplot as plt
-import cv2
-
-
 def print_IDs():
-    print("123456789 + 987654321 \n")
+    print("213991029 + 213996549 \n")
 
 
 def clean_im1(im):
