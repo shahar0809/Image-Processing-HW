@@ -118,11 +118,6 @@ def clean_im7(im):
 
 # bears
 def clean_im8(img):
-    # alpha = 1.95  # Contrast control (1.0-3.0)
-    # beta = 0  # Brightness control (0-100)
-    #
-    # return cv2.convertScaleAbs(img, alpha=alpha, beta=beta)
-
     return contrast_enhance(img, [0, 255])[0]
 
 
@@ -139,82 +134,6 @@ def contrast_enhance(im, gray_range):
     b = np.min(gray_range) - im.min() * a
     nim = np.array(im * a + b)
     return np.array(nim, dtype=np.uint8), a, b
-
-
-def findProjectiveTransform(pointsSet1, pointsSet2):
-    N = pointsSet1.shape[1]
-    new_points_list_x1 = list()
-    new_points_list_x2 = list()
-
-    # iterate iver points to create x , x'
-    for i in range(0, N):
-        point_x_set1 = pointsSet1[0][i]
-        point_y_set1 = pointsSet1[1][i]
-        point_x_set2 = pointsSet2[0][i]
-        point_y_set2 = pointsSet2[1][i]
-        new_points_list_x1.append(
-            [point_x_set1, point_y_set1, 0, 0, 1, 0, -point_x_set1 * point_x_set2, -point_y_set1 * point_x_set2])
-        new_points_list_x1.append(
-            [0, 0, point_x_set1, point_y_set1, 0, 1, -point_x_set1 * point_y_set2, -point_y_set1 * point_y_set2])
-
-        new_points_list_x2.append([point_x_set2])
-        new_points_list_x2.append([point_y_set2])
-
-    x1_matrix = np.array(new_points_list_x1)
-    x2_matrix = np.array(new_points_list_x2)
-
-    projective_parameters = np.vstack([np.matmul(np.linalg.pinv(x1_matrix), x2_matrix), [1]]).reshape((3, 3))
-    c = projective_parameters[0][2]
-    projective_parameters[0][2] = projective_parameters[1][1]
-    projective_parameters[1][1] = projective_parameters[1][0]
-    projective_parameters[1][0] = c
-    return projective_parameters
-
-
-def mapImage(im, T, sizeOutIm):
-    im_new = np.zeros(sizeOutIm)
-
-    # create mesh grid of all coordinates in new image [x,y]
-    xx, yy = np.meshgrid(list(range(sizeOutIm[1])), list(range(sizeOutIm[0])))
-    xy = np.vstack([xx.ravel(), yy.ravel()])
-
-    # add homogenous coord [x,y,1]
-    homogeneous_xy = np.vstack([xy, np.array([1] * xx.ravel().size)])
-
-    # calculate source coordinates that correspond to [x,y,1] in new image
-    source_coordinates = np.matmul(np.linalg.inv(T), homogeneous_xy)
-    source_coordinates[0] = source_coordinates[0] / source_coordinates[2]
-    source_coordinates[1] = source_coordinates[1] / source_coordinates[2]
-    source_coordinates = np.delete(source_coordinates, 2, 0)
-
-    # find coordinates outside range and delete (in source and target)
-    outside_range_bool_array = np.vstack(
-        [np.any([source_coordinates[0] < 0, source_coordinates[0] > im.shape[1] - 1], axis=0),
-         np.any([source_coordinates[1] < 0, source_coordinates[1] > im.shape[0] - 1], axis=0)])
-
-    only_inside_range = np.delete(source_coordinates, np.argwhere(np.any(outside_range_bool_array, axis=0)), 1)
-
-    x_left = np.floor(only_inside_range[1])
-    x_right = np.ceil(only_inside_range[1])
-    y_top = np.floor(only_inside_range[0])
-    y_bottom = np.ceil(only_inside_range[0])
-
-    # interpolate - bilinear
-    deltaX = only_inside_range[1] - x_left
-    deltaY = only_inside_range[0] - y_top
-
-    upper_x = np.multiply(deltaX, im[np.uint8(x_right), np.uint8(y_bottom)]) + np.multiply((1 - deltaX), im[
-        np.uint8(x_left), np.uint8(y_bottom)])
-    bottom_x = np.multiply(deltaX, im[np.uint8(x_right), np.uint8(y_top)]) + np.multiply((1 - deltaX), im[
-        np.uint8(x_left), np.uint8(y_top)])
-    temp_im = np.multiply(deltaY, upper_x) + np.multiply((1 - deltaY), bottom_x)
-
-    # apply corresponding coordinates
-    flat_new_im = im_new.ravel()
-    flat_new_im[(np.argwhere(np.logical_not(np.any(outside_range_bool_array, axis=0)))).transpose()] = temp_im[
-        list(range(temp_im.shape[0]))]
-
-    return flat_new_im.reshape(sizeOutIm)
 
 
 def getImagePts(im, varName, nPoints):
