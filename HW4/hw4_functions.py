@@ -1,13 +1,81 @@
 import numpy as np
 import cv2 as cv2
+from matplotlib import pyplot as plt
+
 
 def print_IDs():
     print("213991029 + 213996549 \n")
 
+
+def get_dst_points(points):
+    # rect = np.zeros((4, 2), dtype="float32")
+    # s = points.sum(axis=1)
+    # rect[0] = points[np.argmin(s)]
+    # rect[2] = points[np.argmax(s)]
+    # diff = np.diff(points, axis=1)
+    # rect[1] = points[np.argmin(diff)]
+    # rect[3] = points[np.argmax(diff)]
+
+    return np.transpose(points).astype('float32')
+
+
+def get_rect_width(points):
+    bottom_left = points[3], bottom_right = points[2]
+    return np.sqrt(((bottom_right[0] - bottom_left[0]) ** 2) + ((bottom_right[1] - bottom_left[1]) ** 2))
+
+
+def align_img(img, points, isPerspective):
+    rect = get_dst_points(points)
+    (tl, tr, br, bl) = rect
+
+    widthA = np.sqrt(((br[0] - bl[0]) ** 2) + ((br[1] - bl[1]) ** 2))
+    widthB = np.sqrt(((tr[0] - tl[0]) ** 2) + ((tr[1] - tl[1]) ** 2))
+    maxWidth = max(int(widthA), int(widthB))
+
+    heightA = np.sqrt(((tr[0] - br[0]) ** 2) + ((tr[1] - br[1]) ** 2))
+    heightB = np.sqrt(((tl[0] - bl[0]) ** 2) + ((tl[1] - bl[1]) ** 2))
+    maxHeight = max(int(heightA), int(heightB))
+
+    dst = np.array([
+        [tl[0], tl[1]],
+        [tl[0] + maxWidth - 1, tl[1]],
+        [tl[0] + maxWidth - 1, tl[1] + maxHeight - 1],
+        [tl[0], tl[1] + maxHeight - 1]], dtype="float32")
+
+    if isPerspective:
+        M = cv2.getPerspectiveTransform(rect[:, [0, 1]].astype("float32"), dst)
+        return cv2.warpPerspective(img, M, (maxWidth, maxHeight))
+    else:
+        M = cv2.getAffineTransform(rect[:, [0, 1]].astype("float32"), dst)
+        return cv2.warpAffine(img, M, (maxWidth, maxHeight))
+
+
 # baby
-def clean_im1(im):
-    clean_im = 0
-    return clean_im
+def clean_im1(img, points1, points2, points3):
+    rect = get_dst_points(points1)
+    (tl, tr, br, bl) = rect.astype(int)
+    height = np.sqrt(((tr[0] - br[0]) ** 2) + ((tr[1] - br[1]) ** 2))
+    width = np.sqrt(((tr[0] - tl[0]) ** 2) + ((tr[1] - tl[1]) ** 2))
+
+    aligned_img1 = img[tl[1]:bl[1] + 1, tl[0]:tr[0] + 1]
+
+    aligned_img2 = align_img(img, points2, True)
+    aligned_img3 = align_img(img, points3, False)
+
+    plt.figure()
+    plt.subplot(1, 3, 1)
+    plt.imshow(aligned_img1, cmap='gray', vmin=0, vmax=255)
+    plt.title("im1")
+    plt.subplot(1, 3, 2)
+    plt.imshow(aligned_img2, cmap='gray', vmin=0, vmax=255)
+    plt.title("im2")
+    plt.subplot(1, 3, 3)
+    plt.imshow(aligned_img3, cmap='gray', vmin=0, vmax=255)
+    plt.title("im3")
+    plt.show()
+
+    return img
+
 
 # windmill
 def clean_im2(img):
@@ -16,31 +84,37 @@ def clean_im2(img):
     fshift = np.fft.fftshift(f)
     return fshift
 
+
 # watermelon
 def clean_im3(img):
     img_fourier = np.fft.fftshift(np.fft.fft2(img))
 
     return clean_im
 
+
 # umbrella
 def clean_im4(im):
     clean_im = 0
     return clean_im
+
 
 # USA flag
 def clean_im5(im):
     clean_im = 0
     return clean_im
 
+
 # cups
 def clean_im6(im):
     clean_im = 0
     return clean_im
 
+
 # house
 def clean_im7(im):
     clean_im = 0
     return clean_im
+
 
 # bears
 def clean_im8(img):
@@ -51,17 +125,110 @@ def clean_im8(img):
 
     return contrast_enhance(img, [0, 255])[0]
 
+
 def highpass(img, sigma):
     return img - cv2.GaussianBlur(img, (0, 0), sigma) + 127
+
 
 def fft(img):
     return np.fft.fftshift(np.fft.fft2(img))
 
-def contrast_enhance(im, range):
-    a = (np.max(range) - np.min(range)) / (im.max() - im.min())
-    b = np.min(range) - im.min() * a
+
+def contrast_enhance(im, gray_range):
+    a = (np.max(gray_range) - np.min(gray_range)) / (im.max() - im.min())
+    b = np.min(gray_range) - im.min() * a
     nim = np.array(im * a + b)
     return np.array(nim, dtype=np.uint8), a, b
+
+
+def findProjectiveTransform(pointsSet1, pointsSet2):
+    N = pointsSet1.shape[1]
+    new_points_list_x1 = list()
+    new_points_list_x2 = list()
+
+    # iterate iver points to create x , x'
+    for i in range(0, N):
+        point_x_set1 = pointsSet1[0][i]
+        point_y_set1 = pointsSet1[1][i]
+        point_x_set2 = pointsSet2[0][i]
+        point_y_set2 = pointsSet2[1][i]
+        new_points_list_x1.append(
+            [point_x_set1, point_y_set1, 0, 0, 1, 0, -point_x_set1 * point_x_set2, -point_y_set1 * point_x_set2])
+        new_points_list_x1.append(
+            [0, 0, point_x_set1, point_y_set1, 0, 1, -point_x_set1 * point_y_set2, -point_y_set1 * point_y_set2])
+
+        new_points_list_x2.append([point_x_set2])
+        new_points_list_x2.append([point_y_set2])
+
+    x1_matrix = np.array(new_points_list_x1)
+    x2_matrix = np.array(new_points_list_x2)
+
+    projective_parameters = np.vstack([np.matmul(np.linalg.pinv(x1_matrix), x2_matrix), [1]]).reshape((3, 3))
+    c = projective_parameters[0][2]
+    projective_parameters[0][2] = projective_parameters[1][1]
+    projective_parameters[1][1] = projective_parameters[1][0]
+    projective_parameters[1][0] = c
+    return projective_parameters
+
+
+def mapImage(im, T, sizeOutIm):
+    im_new = np.zeros(sizeOutIm)
+
+    # create mesh grid of all coordinates in new image [x,y]
+    xx, yy = np.meshgrid(list(range(sizeOutIm[1])), list(range(sizeOutIm[0])))
+    xy = np.vstack([xx.ravel(), yy.ravel()])
+
+    # add homogenous coord [x,y,1]
+    homogeneous_xy = np.vstack([xy, np.array([1] * xx.ravel().size)])
+
+    # calculate source coordinates that correspond to [x,y,1] in new image
+    source_coordinates = np.matmul(np.linalg.inv(T), homogeneous_xy)
+    source_coordinates[0] = source_coordinates[0] / source_coordinates[2]
+    source_coordinates[1] = source_coordinates[1] / source_coordinates[2]
+    source_coordinates = np.delete(source_coordinates, 2, 0)
+
+    # find coordinates outside range and delete (in source and target)
+    outside_range_bool_array = np.vstack(
+        [np.any([source_coordinates[0] < 0, source_coordinates[0] > im.shape[1] - 1], axis=0),
+         np.any([source_coordinates[1] < 0, source_coordinates[1] > im.shape[0] - 1], axis=0)])
+
+    only_inside_range = np.delete(source_coordinates, np.argwhere(np.any(outside_range_bool_array, axis=0)), 1)
+
+    x_left = np.floor(only_inside_range[1])
+    x_right = np.ceil(only_inside_range[1])
+    y_top = np.floor(only_inside_range[0])
+    y_bottom = np.ceil(only_inside_range[0])
+
+    # interpolate - bilinear
+    deltaX = only_inside_range[1] - x_left
+    deltaY = only_inside_range[0] - y_top
+
+    upper_x = np.multiply(deltaX, im[np.uint8(x_right), np.uint8(y_bottom)]) + np.multiply((1 - deltaX), im[
+        np.uint8(x_left), np.uint8(y_bottom)])
+    bottom_x = np.multiply(deltaX, im[np.uint8(x_right), np.uint8(y_top)]) + np.multiply((1 - deltaX), im[
+        np.uint8(x_left), np.uint8(y_top)])
+    temp_im = np.multiply(deltaY, upper_x) + np.multiply((1 - deltaY), bottom_x)
+
+    # apply corresponding coordinates
+    flat_new_im = im_new.ravel()
+    flat_new_im[(np.argwhere(np.logical_not(np.any(outside_range_bool_array, axis=0)))).transpose()] = temp_im[
+        list(range(temp_im.shape[0]))]
+
+    return flat_new_im.reshape(sizeOutIm)
+
+
+def getImagePts(im, varName, nPoints):
+    fig = plt.figure()
+    fig.set_label("Select {} points in the first image".format(nPoints))
+    plt.imshow(im, cmap='gray', vmin=0, vmax=255)
+    image_list = plt.ginput(n=nPoints, show_clicks=True)
+    plt.close()
+
+    imagePts = np.round(np.array([[first_in_tuple[0] for first_in_tuple in image_list],
+                                  [second_in_tuple[1] for second_in_tuple in image_list], [1] * nPoints]))
+
+    np.save(varName + ".npy", imagePts)
+
 
 '''
     # an example of how to use fourier transform:
