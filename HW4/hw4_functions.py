@@ -108,7 +108,7 @@ def clean_im5(im):
 
 # cups
 def clean_im6(img):
-    clean_im = contrast_enhance(img, [0, 255])[0]
+    clean_im = 0
     return clean_im
 
 

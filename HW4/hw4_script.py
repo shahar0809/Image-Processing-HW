@@ -30,19 +30,19 @@ if __name__ == "__main__":
     # print("Describe the problem with the image and your method/solution: \n")
     # print("   TODO: add explanation    \n")
 
-    # print("-----------------------image 2----------------------\n")
-    # im2 = cv2.imread(r'Images\windmill.tif')
-    # im2 = cv2.cvtColor(im2, cv2.COLOR_BGR2GRAY)
-    # im2_clean = clean_im2(im2)
-    #
-    # plt.figure()
-    # plt.subplot(1, 2, 1)
-    # plt.imshow(im2, cmap='gray', vmin=0, vmax=255)
-    # plt.subplot(1, 2, 2)
-    # plt.imshow(np.log(np.abs(im2_clean)), cmap='gray', vmin=0, vmax=255)
-    #
-    # print("Describe the problem with the image and your method/solution: \n")
-    # print("   TODO: add explanation    \n")
+    print("-----------------------image 2----------------------\n")
+    im2 = cv2.imread(r'Images\windmill.tif')
+    im2 = cv2.cvtColor(im2, cv2.COLOR_BGR2GRAY)
+    im2_clean = clean_im2(im2)
+
+    plt.figure()
+    plt.subplot(1, 2, 1)
+    plt.imshow(im2, cmap='gray', vmin=0, vmax=255)
+    plt.subplot(1, 2, 2)
+    plt.imshow(np.log(np.abs(im2_clean)), cmap='gray', vmin=0, vmax=255)
+
+    print("Describe the problem with the image and your method/solution: \n")
+    print("   TODO: add explanation    \n")
 
     print("-----------------------image 3----------------------\n")
     im3 = cv2.imread(r'Images\watermelon.tif')
@@ -86,19 +86,19 @@ if __name__ == "__main__":
     # print("Describe the problem with the image and your method/solution: \n")
     # print("   TODO: add explanation    \n")
     #
-    # print("-----------------------image 6----------------------\n")
-    # im6 = cv2.imread(r'Images\cups.tif')
-    # im6 = cv2.cvtColor(im6, cv2.COLOR_BGR2GRAY)
-    # im6_clean = clean_im2(im6)
-    #
-    # plt.figure()
-    # plt.subplot(1, 2, 1)
-    # plt.imshow(im6, cmap='gray', vmin=0, vmax=255)
-    # plt.subplot(1, 2, 2)
-    # plt.imshow(im6_clean, cmap='gray', vmin=0, vmax=255)
-    #
-    # print("Describe the problem with the image and your method/solution: \n")
-    # print("   TODO: add explanation    \n")
+    print("-----------------------image 6----------------------\n")
+    im6 = cv2.imread(r'Images\cups.tif')
+    im6 = cv2.cvtColor(im6, cv2.COLOR_BGR2GRAY)
+    im6_clean = clean_im6(im6)
+
+    plt.figure()
+    plt.subplot(1, 2, 1)
+    plt.imshow(im6, cmap='gray', vmin=0, vmax=255)
+    plt.subplot(1, 2, 2)
+    plt.imshow(im6_clean, cmap='gray', vmin=0, vmax=255)
+
+    print("Describe the problem with the image and your method/solution: \n")
+    print("   TODO: add explanation    \n")
 
     # print("-----------------------image 7----------------------\n")
     # im7 = cv2.imread(r'Images\house.tif')
