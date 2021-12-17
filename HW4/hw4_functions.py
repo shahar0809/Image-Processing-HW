@@ -1,5 +1,5 @@
-import numpy as np
 import cv2 as cv2
+import numpy as np
 from matplotlib import pyplot as plt
 
 
@@ -52,27 +52,27 @@ def align_img(img, points, isPerspective):
 
 # baby
 def clean_im1(img, points1, points2, points3):
-    rect = get_dst_points(points1)
-    (tl, tr, br, bl) = rect.astype(int)
-    height = np.sqrt(((tr[0] - br[0]) ** 2) + ((tr[1] - br[1]) ** 2))
-    width = np.sqrt(((tr[0] - tl[0]) ** 2) + ((tr[1] - tl[1]) ** 2))
-
-    aligned_img1 = img[tl[1]:bl[1] + 1, tl[0]:tr[0] + 1]
-
-    aligned_img2 = align_img(img, points2, True)
-    aligned_img3 = align_img(img, points3, False)
-
-    plt.figure()
-    plt.subplot(1, 3, 1)
-    plt.imshow(aligned_img1, cmap='gray', vmin=0, vmax=255)
-    plt.title("im1")
-    plt.subplot(1, 3, 2)
-    plt.imshow(aligned_img2, cmap='gray', vmin=0, vmax=255)
-    plt.title("im2")
-    plt.subplot(1, 3, 3)
-    plt.imshow(aligned_img3, cmap='gray', vmin=0, vmax=255)
-    plt.title("im3")
-    plt.show()
+    # rect = get_dst_points(points1)
+    # (tl, tr, br, bl) = rect.astype(int)
+    # height = np.sqrt(((tr[0] - br[0]) ** 2) + ((tr[1] - br[1]) ** 2))
+    # width = np.sqrt(((tr[0] - tl[0]) ** 2) + ((tr[1] - tl[1]) ** 2))
+    #
+    # aligned_img1 = img[tl[1]:bl[1] + 1, tl[0]:tr[0] + 1]
+    #
+    # aligned_img2 = align_img(img, points2, True)
+    # aligned_img3 = align_img(img, points3, False)
+    #
+    # plt.figure()
+    # plt.subplot(1, 3, 1)
+    # plt.imshow(aligned_img1, cmap='gray', vmin=0, vmax=255)
+    # plt.title("im1")
+    # plt.subplot(1, 3, 2)
+    # plt.imshow(aligned_img2, cmap='gray', vmin=0, vmax=255)
+    # plt.title("im2")
+    # plt.subplot(1, 3, 3)
+    # plt.imshow(aligned_img3, cmap='gray', vmin=0, vmax=255)
+    # plt.title("im3")
+    # plt.show()
 
     return img
 
@@ -87,9 +87,11 @@ def clean_im2(img):
 
 # watermelon
 def clean_im3(img):
-    img_fourier = np.fft.fftshift(np.fft.fft2(img))
-
-    return clean_im
+    kernel = np.array([[0, -1, 0],
+                       [-1, 5, -1],
+                       [0, -1, 0]])
+    image_sharp = cv2.filter2D(src=img, ddepth=-1, kernel=kernel)
+    return image_sharp
 
 
 # umbrella
@@ -105,16 +107,15 @@ def clean_im5(im):
 
 
 # cups
-def clean_im6(im):
-    clean_im = 0
+def clean_im6(img):
+    clean_im = contrast_enhance(img, [0, 255])[0]
     return clean_im
 
 
 # house
-def clean_im7(im):
+def clean_im7(img):
     clean_im = 0
     return clean_im
-
 
 # bears
 def clean_im8(img):
