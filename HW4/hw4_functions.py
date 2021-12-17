@@ -1,45 +1,67 @@
+import numpy as np
+import cv2 as cv2
+
 def print_IDs():
     print("213991029 + 213996549 \n")
 
-
+# baby
 def clean_im1(im):
     clean_im = 0
     return clean_im
 
+# windmill
+def clean_im2(img):
+    img_fourier = np.fft.fftshift(np.fft.fft2(img))
+    f = np.fft.fft2(img)
+    fshift = np.fft.fftshift(f)
+    return fshift
 
-def clean_im2(im):
-    clean_im = 0
+# watermelon
+def clean_im3(img):
+    img_fourier = np.fft.fftshift(np.fft.fft2(img))
+
     return clean_im
 
-
-def clean_im3(im):
-    clean_im = 0
-    return clean_im
-
-
+# umbrella
 def clean_im4(im):
     clean_im = 0
     return clean_im
 
-
+# USA flag
 def clean_im5(im):
     clean_im = 0
     return clean_im
 
+# cups
 def clean_im6(im):
     clean_im = 0
     return clean_im
 
-
+# house
 def clean_im7(im):
     clean_im = 0
     return clean_im
 
+# bears
+def clean_im8(img):
+    # alpha = 1.95  # Contrast control (1.0-3.0)
+    # beta = 0  # Brightness control (0-100)
+    #
+    # return cv2.convertScaleAbs(img, alpha=alpha, beta=beta)
 
-def clean_im8(im):
-    clean_im = 0
-    return clean_im
+    return contrast_enhance(img, [0, 255])[0]
 
+def highpass(img, sigma):
+    return img - cv2.GaussianBlur(img, (0, 0), sigma) + 127
+
+def fft(img):
+    return np.fft.fftshift(np.fft.fft2(img))
+
+def contrast_enhance(im, range):
+    a = (np.max(range) - np.min(range)) / (im.max() - im.min())
+    b = np.min(range) - im.min() * a
+    nim = np.array(im * a + b)
+    return np.array(nim, dtype=np.uint8), a, b
 
 '''
     # an example of how to use fourier transform:
