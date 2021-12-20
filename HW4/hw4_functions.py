@@ -1,8 +1,7 @@
 import cv2 as cv2
 import numpy as np
-import scipy.signal
-
 from matplotlib import pyplot as plt
+from scipy.ndimage import median_filter
 
 
 def print_IDs():
@@ -57,15 +56,32 @@ def clean_im4(img):
 
 
 # USA flag
-def clean_im5(im):
-    clean_im = 0
-    return clean_im
+def clean_im5(img):
+    # median_im = img.copy()
+    # for row in range(0, img.shape[0]):
+    #     for col in range(7, img.shape[1] - 7):
+    #         filtering_mask = median_im[row:row + 1, col - 7:col + 8]
+    #         median_im[row][col] = np.median(filtering_mask)
+    # median_im[0:90, 0:140] = img[0:90, 0:140]
+    # return median_im
+    clean_img1 = img.copy()
+    clean_img = median_filter(clean_img1, (1, 8))
+    clean_img2 = median_filter(clean_img, (1, 3))
+    clean_img2[0:90, 0:140] = img[0:90, 0:140]
+    return clean_img2
 
 
 # cups
 def clean_im6(img):
-    clean_im = 0
-    return clean_im
+    img_fourier = np.fft.fftshift(np.fft.fft2(img))
+    rows, cols = img.shape
+
+    img_fourier[108:149, 108:149] *= 1.6
+
+    f_ishift = np.fft.ifftshift(img_fourier)
+    img_back = np.fft.ifft2(f_ishift)
+    clean_img = np.real(img_back)
+    return clean_img
 
 
 # house
@@ -179,10 +195,7 @@ def find_projective_transform(points_set1, points_set2):
 
 def fft_moved_img(img, mask):
     mask_fft = np.fft.fftshift(np.fft.fft2(mask))
-    for i in range(mask_fft.shape[0]):
-        for j in range(mask_fft.shape[1]):
-            if abs(mask_fft[i][j]) <= 0.01:
-                mask_fft[i][j] = 1
+    mask_fft[abs(mask_fft) <= 0.01] = 1
     img_fft = np.fft.fftshift(np.fft.fft2(img))
     clean_im = img_fft / mask_fft
     return abs(np.fft.ifft2(clean_im))
@@ -203,12 +216,12 @@ def contrast_enhance(im, gray_range):
     img = cv2.imread(r'Images\windmill.tif')
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     img_fourier = np.fft.fftshift(np.fft.fft2(img))
-    
+
     plt.figure()
     plt.subplot(1,3,1)
     plt.imshow(img, cmap='gray')
     plt.title('original image')
-    
+
     plt.subplot(1,3,2)
     plt.imshow(np.log(abs(img_fourier)), cmap='gray')
     plt.title('fourier transform of image')
