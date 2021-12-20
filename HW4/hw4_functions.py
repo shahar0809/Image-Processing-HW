@@ -1,5 +1,7 @@
 import cv2 as cv2
 import numpy as np
+import scipy.signal
+
 from matplotlib import pyplot as plt
 
 
@@ -16,8 +18,23 @@ def clean_im1(img):
 
 # windmill
 def clean_im2(img):
-    fft_shift = np.fft.fftshift(np.fft.fft2(img))
-    return fft_shift
+    img_fourier = np.fft.fftshift(np.fft.fft2(img))
+
+    rows, cols = img.shape
+    center_rows, center_cols = rows // 2, cols // 2
+    magnitude = 15 * np.log(abs(img_fourier) + 1)
+    magnitude_peak = np.flip(np.dstack(np.unravel_index(np.argsort(magnitude.ravel()), magnitude.shape)))
+    magnitude_peak = magnitude_peak.reshape((img.ravel().shape[0], 2))
+    peak_points = magnitude_peak[np.logical_and(np.abs(magnitude_peak[:, 0] - center_rows) > 2,
+                                                np.abs(magnitude_peak[:, 1] - center_rows) > 2)]
+    peak_points[:, [0, 1]] = peak_points[:, [1, 0]]
+    peak_points = peak_points[:2]
+    row, col = peak_points[:, 0], peak_points[:, 1]
+    img_fourier[row, col] = 0
+    f_ishift = np.fft.ifftshift(img_fourier)
+    img_back = np.fft.ifft2(f_ishift)
+    clean_img = np.real(img_back)
+    return clean_img
 
 
 # watermelon
