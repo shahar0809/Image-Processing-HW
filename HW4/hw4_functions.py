@@ -30,9 +30,13 @@ def clean_im3(img):
 
 
 # umbrella
-def clean_im4(im):
-    clean_im = 0
-    return clean_im
+def clean_im4(img):
+    mask = np.zeros(img.shape)
+    mask[0][0] = 1
+    mask[4][79] = 1
+    mask = mask / np.sum(mask)
+
+    return fft_moved_img(img, mask)
 
 
 # USA flag
@@ -49,24 +53,16 @@ def clean_im6(img):
 
 # house
 def clean_im7(img):
-    mask = np.array([1] * 10) / np.sum([1] * 10)
-    clean_im = 0
-    return clean_im
+    mask = np.zeros(img.shape)
+    mask[0:1, 0:10] = np.array([1] * 10)
+    mask = mask / np.sum(mask)
+
+    return fft_moved_img(img, mask)
 
 
 # bears
 def clean_im8(img):
     return contrast_enhance(img, [0, 255])[0]
-
-
-""" Auxiliary functions for clean_im3 and clean_im8 """
-
-
-def contrast_enhance(im, gray_range):
-    a = (np.max(gray_range) - np.min(gray_range)) / (im.max() - im.min())
-    b = np.min(gray_range) - im.min() * a
-    nim = np.array(im * a + b)
-    return np.array(nim, dtype=np.uint8), a, b
 
 
 """ Auxiliary functions for clean_im1 """
@@ -159,6 +155,30 @@ def find_projective_transform(points_set1, points_set2):
     projective_parameters[1][1] = projective_parameters[1][0]
     projective_parameters[1][0] = c
     return projective_parameters
+
+
+""" Auxiliary functions for clean_im4 and clean_im7 """
+
+
+def fft_moved_img(img, mask):
+    mask_fft = np.fft.fftshift(np.fft.fft2(mask))
+    for i in range(mask_fft.shape[0]):
+        for j in range(mask_fft.shape[1]):
+            if abs(mask_fft[i][j]) <= 0.01:
+                mask_fft[i][j] = 1
+    img_fft = np.fft.fftshift(np.fft.fft2(img))
+    clean_im = img_fft / mask_fft
+    return abs(np.fft.ifft2(clean_im))
+
+
+""" Auxiliary functions for clean_im3 and clean_im8 """
+
+
+def contrast_enhance(im, gray_range):
+    a = (np.max(gray_range) - np.min(gray_range)) / (im.max() - im.min())
+    b = np.min(gray_range) - im.min() * a
+    nim = np.array(im * a + b)
+    return np.array(nim, dtype=np.uint8), a, b
 
 
 '''
