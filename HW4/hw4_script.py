@@ -22,19 +22,19 @@ if __name__ == "__main__":
     print("Describe the problem with the image and your method/solution: \n")
     print("   TODO: add explanation    \n")
 
-    # print("-----------------------image 2----------------------\n")
-    # im2 = cv2.imread(r'Images\windmill.tif')
-    # im2 = cv2.cvtColor(im2, cv2.COLOR_BGR2GRAY)
-    # im2_clean = clean_im2(im2)
-    #
-    # plt.figure()
-    # plt.subplot(1, 2, 1)
-    # plt.imshow(im2, cmap='gray', vmin=0, vmax=255)
-    # plt.subplot(1, 2, 2)
-    # plt.imshow(np.log(np.abs(im2_clean)), cmap='gray', vmin=0, vmax=255)
-    #
-    # print("Describe the problem with the image and your method/solution: \n")
-    # print("   TODO: add explanation    \n")
+    print("-----------------------image 2----------------------\n")
+    im2 = cv2.imread(r'Images\windmill.tif')
+    im2 = cv2.cvtColor(im2, cv2.COLOR_BGR2GRAY)
+    im2_clean = clean_im2(im2)
+
+    plt.figure()
+    plt.subplot(1, 2, 1)
+    plt.imshow(im2, cmap='gray', vmin=0, vmax=255)
+    plt.subplot(1, 2, 2)
+    plt.imshow(im2_clean, cmap='gray', vmin=0, vmax=255)
+
+    print("Describe the problem with the image and your method/solution: \n")
+    print("   TODO: add explanation    \n")
 
     print("-----------------------image 3----------------------\n")
     im3 = cv2.imread(r'Images\watermelon.tif')
