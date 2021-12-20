@@ -10,6 +10,7 @@ if __name__ == "__main__":
 
     # get_image_pts(im1, "baby_points1", 4)
     # get_image_pts(im1, "baby_points2", 4)
+    # get_image_pts(im1, "baby_points3", 4)
 
     im1_clean = clean_im1(im1)
 

@@ -10,9 +10,27 @@ def print_IDs():
 
 # baby
 def clean_im1(img):
-    transform = find_projective_transform(np.load("baby_points1.npy"), np.load("baby_points2.npy"))
-    clean_img = cv2.medianBlur(img, 3)
-    return map_image(clean_img, transform, clean_img.shape)
+    baby_points1 = np.load("baby_points1.npy").astype('float32')
+    baby_points2 = np.load("baby_points2.npy").astype('float32')
+    baby_points3 = np.load("baby_points3.npy").astype('float32')
+
+    dst = np.array([[0, 0], [img.shape[0], 0], [img.shape[0], img.shape[1]], [0, img.shape[1]]], dtype='float32')
+    # Apply perspective transformation on all images
+    perspective_trans1 = cv2.getPerspectiveTransform(baby_points1, dst)
+    first_image = cv2.warpPerspective(img, perspective_trans1, img.shape)
+    perspective_trans2 = cv2.getPerspectiveTransform(baby_points2, dst)
+    second_image = cv2.warpPerspective(img, perspective_trans2, img.shape)
+    perspective_trans3 = cv2.getPerspectiveTransform(baby_points3, dst)
+    third_image = cv2.warpPerspective(img, perspective_trans3, img.shape)
+
+    second_image[np.logical_or(second_image == 255, second_image == 0)] = third_image
+    first_image[np.logical_or(first_image == 255, first_image == 0)] = second_image
+
+    # transform = find_projective_transform(np.load("baby_points1.npy"), np.load("baby_points2.npy"))
+
+    clean_img = cv2.medianBlur(first_image, 3)
+    return clean_img
+    # return map_image(clean_img, transform, clean_img.shape)
 
 
 # windmill
@@ -108,8 +126,12 @@ def get_image_pts(im, var_name, n_points):
     image_list = plt.ginput(n=n_points, show_clicks=True)
     plt.close()
 
-    image_points = np.round(np.array([[first_in_tuple[0] for first_in_tuple in image_list],
-                                      [second_in_tuple[1] for second_in_tuple in image_list], [1] * n_points]))
+    image_points = list()
+    for i in range(n_points):
+        image_points.append([image_list[i][0], image_list[i][1]])
+    image_points = np.round(np.array(image_points))
+    # image_points = np.round(np.array([[first_in_tuple[0] for first_in_tuple in image_list],
+    #                                   [second_in_tuple[1] for second_in_tuple in image_list], [1] * n_points]))
 
     np.save(var_name + ".npy", image_points)
 
