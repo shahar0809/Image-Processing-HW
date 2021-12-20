@@ -2,7 +2,7 @@ from hw4_functions import *
 
 if __name__ == "__main__":
     print("----------------------------------------------------\n")
-    print_IDs
+    print_IDs()
 
     print("-----------------------image 1----------------------\n")
     im1 = cv2.imread(r'Images\baby.tif')
@@ -19,7 +19,7 @@ if __name__ == "__main__":
     plt.subplot(1, 2, 2)
     plt.imshow(im1_clean, cmap='gray', vmin=0, vmax=255)
 
-    print("Describe the problem with the image and your method/solution: \n")
+    print("Describe the problem with the image and your method/solution:")
     print("   TODO: add explanation    \n")
 
     print("-----------------------image 2----------------------\n")
@@ -33,8 +33,10 @@ if __name__ == "__main__":
     plt.subplot(1, 2, 2)
     plt.imshow(im2_clean, cmap='gray', vmin=0, vmax=255)
 
-    print("Describe the problem with the image and your method/solution: \n")
-    print("   TODO: add explanation    \n")
+    print("Describe the problem with the image and your method/solution:")
+    print("We noticed periodic noise in the image.\n"
+          "Then, we transferred the image to the frequency space, and zeroed out the first 2 peaks that weren't close the origin of the image.\n"
+          "lastly, we transferred the image back using inverse fft.\n")
 
     print("-----------------------image 3----------------------\n")
     im3 = cv2.imread(r'Images\watermelon.tif')
@@ -47,8 +49,9 @@ if __name__ == "__main__":
     plt.subplot(1, 2, 2)
     plt.imshow(im3_clean, cmap='gray', vmin=0, vmax=255)
 
-    print("Describe the problem with the image and your method/solution: \n")
-    print("   TODO: add explanation    \n")
+    print("Describe the problem with the image and your method/solution:")
+    print("We noticed that the image wasn't sharp and bright enough.\n"
+          "So, we enhanced the contrast to be maximal, and used sharpening filter [kernel taken from Wikipedia].")
 
     print("-----------------------image 4----------------------\n")
     im4 = cv2.imread(r'Images\umbrella.tif')
@@ -61,8 +64,15 @@ if __name__ == "__main__":
     plt.subplot(1, 2, 2)
     plt.imshow(im4_clean, cmap='gray', vmin=0, vmax=255)
 
-    print("Describe the problem with the image and your method/solution: \n")
-    print("   TODO: add explanation    \n")
+    print("Describe the problem with the image and your method/solution:")
+    print(
+        "We noticed the echo effect because the image wasn't smooth in color (there were double objects) .\n"
+        "We calculated the point in which the picture was moved in both axes [(4, 79), (0, 0)].\n"
+        "Then, we created translation mask with the points above, and moved to the frequency space.\n"
+        "In order to reduce noise and avoid division by 0, we set small values to 1.\n"
+        "In order to restore the image, we divided the fft of the image by the fft of the mask.\n"
+        "Lastly, we converted the image back using inverse fft."
+        " \n")
 
     print("-----------------------image 5----------------------\n")
     im5 = cv2.imread(r'Images\USAflag.tif')
@@ -75,8 +85,10 @@ if __name__ == "__main__":
     plt.subplot(1, 2, 2)
     plt.imshow(im5_clean, cmap='gray', vmin=0, vmax=255)
 
-    print("Describe the problem with the image and your method/solution: \n")
-    print("   TODO: add explanation    \n")
+    print("Describe the problem with the image and your method/solution:")
+    print("The flag had letters that we wanted to remove.\n"
+          "We used a median filter (after playing around with the parameters), "
+          "and put the original image over the part of the stars (to avoid median artifacts)\n")
 
     print("-----------------------image 6----------------------\n")
     im6 = cv2.imread(r'Images\cups.tif')
@@ -89,8 +101,12 @@ if __name__ == "__main__":
     plt.subplot(1, 2, 2)
     plt.imshow(im6_clean, cmap='gray', vmin=0, vmax=255)
 
-    print("Describe the problem with the image and your method/solution: \n")
-    print("   TODO: add explanation    \n")
+    print("Describe the problem with the image and your method/solution:")
+    print("We saw that the image has ringing artifact.\n"
+          "In order to remove it, we looked at the spectrum of the image, and noticed a rectangle.\n"
+          "We wanted to increase the color of the rectangle in the spectrum, so that it wouldn't stand out - we want increased it\n"
+          "After trying a lot of combinations, and found the one.\n"
+          "Lastly, we used inverse fft.\n")
 
     print("-----------------------image 7----------------------\n")
     im7 = cv2.imread(r'Images\house.tif')
@@ -103,13 +119,22 @@ if __name__ == "__main__":
     plt.subplot(1, 2, 2)
     plt.imshow(im7_clean, cmap='gray', vmin=0, vmax=255)
 
-    print("Describe the problem with the image and your method/solution: \n")
-    print("   TODO: add explanation    \n")
+    print("Describe the problem with the image and your method/solution:")
+    print(
+        "We noticed the motion blur effect because the white point in the original image was smeared over 10 pixels.\n"
+        "Then, we created translation mask and moved to the frequency space.\n"
+        "In order to reduce noise and avoid division by 0, we set small values to 1.\n"
+        "In order to restore the image, we divided the fft of the image by the fft of the mask.\n"
+        "Lastly, we converted the image back using inverse fft."
+        " \n")
 
     print("-----------------------image 8----------------------\n")
     im8 = cv2.imread(r'Images\bears.tif')
     im8 = cv2.cvtColor(im8, cv2.COLOR_BGR2GRAY)
     im8_clean = clean_im8(im8)
+
+    print("Describe the problem with the image and your method/solution:")
+    print("The image was dull, so we enhanced the contrast to be maximal.\n")
 
     plt.figure()
     plt.subplot(1, 2, 1)
@@ -118,5 +143,3 @@ if __name__ == "__main__":
     plt.imshow(im8_clean, cmap='gray', vmin=0, vmax=255)
     plt.show()
 
-    print("Describe the problem with the image and your method/solution: \n")
-    print("   TODO: add explanation    \n")
