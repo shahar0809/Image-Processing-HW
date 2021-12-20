@@ -23,14 +23,13 @@ def clean_im1(img):
     perspective_trans3 = cv2.getPerspectiveTransform(baby_points3, dst)
     third_image = cv2.warpPerspective(img, perspective_trans3, img.shape)
 
-    second_image[np.logical_or(second_image == 255, second_image == 0)] = third_image
-    first_image[np.logical_or(first_image == 255, first_image == 0)] = second_image
+    second_image[np.logical_or(second_image == 255, second_image == 0)] = third_image[
+        np.logical_or(second_image == 255, second_image == 0)]
+    first_image[np.logical_or(first_image == 255, first_image == 0)] = second_image[
+        np.logical_or(first_image == 255, first_image == 0)]
 
-    # transform = find_projective_transform(np.load("baby_points1.npy"), np.load("baby_points2.npy"))
-
-    clean_img = cv2.medianBlur(first_image, 3)
+    clean_img = median_filter(first_image, 9)
     return clean_img
-    # return map_image(clean_img, transform, clean_img.shape)
 
 
 # windmill

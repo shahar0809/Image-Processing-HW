@@ -21,7 +21,9 @@ if __name__ == "__main__":
     plt.imshow(im1_clean, cmap='gray', vmin=0, vmax=255)
 
     print("Describe the problem with the image and your method/solution:")
-    print("   TODO: add explanation    \n")
+    print(
+        "The image is formed from 3 images with a perspective transformation, "
+        "because of the salt and pepper noise we knew we need to use median_filter \n")
 
     print("-----------------------image 2----------------------\n")
     im2 = cv2.imread(r'Images\windmill.tif')
