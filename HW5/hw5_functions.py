@@ -1,5 +1,4 @@
 import cv2.cv2 as cv2
-from scipy.signal import convolve2d
 import numpy as np
 from scipy.signal import convolve2d
 
@@ -28,8 +27,6 @@ def sobel_edge_detection(img):
     # return sobel_edges, np.arctan2(vertical_edges, horizontal_edges) * (180 / np.pi) % 360
     return sobel_edges, np.arctan2(vertical_edges, horizontal_edges) * (180 / np.pi) % 360
 
-def canny_edge_detection(img):
-    pass
 
 def threshold_filter(img, threshold):
     img_clone = img.copy()
@@ -53,24 +50,12 @@ def hugh_transform_circles(image):
     return image
 
 
-def hugh_transform_lines(image):
+def hugh_transform_lines(image, rho, theta, threshold, length, gap):
     edges = cv2.Canny(image, 50, 150, apertureSize=3)
-    lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 100, minLineLength=10, maxLineGap=250)
-    # Draw lines on the image
+    lines = cv2.HoughLinesP(edges, rho, theta, threshold, length, gap)
+
     for line in lines:
         x1, y1, x2, y2 = line[0]
         cv2.line(image, (x1, y1), (x2, y2), BlACK, 3)
-    # print(lines)
-    # for line in lines[0]:
-    #     a = np.cos(line[1])
-    #     b = np.sin(line[1])
-    #     x0 = a * line[0]
-    #     y0 = b * line[0]
-    #     x1 = int(x0 + 1000 * (-b))
-    #     y1 = int(y0 + 1000 * (a))
-    #     x2 = int(x0 - 1000 * (-b))
-    #     y2 = int(y0 - 1000 * (a))
-    #
-    #     cv2.line(image, (x1, y1), (x2, y2), (0, 0, 255), 2)
 
     return image
