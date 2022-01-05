@@ -14,8 +14,8 @@ def main_script():
     plt.subplot(1, 2, 2)
     plt.title("Sobel")
     im1_edge_det = sobel_edge_detection(im1)
-    plt.imshow(im1_edge_det, cmap='gray', vmin=0, vmax=255)
-
+    img1_thresh = threshold_filter(im1_edge_det, 24)
+    plt.imshow(img1_thresh, cmap='gray', vmin=0, vmax=255)
     plt.show()
 
 
