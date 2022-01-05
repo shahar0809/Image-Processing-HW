@@ -21,7 +21,11 @@ def sobel_edge_detection(img):
 
     # Normalize back to range of [0, 255]
     sobel_edges = sobel_edges / sobel_edges.max() * 255
-    return sobel_edges
+    # return sobel_edges, np.arctan2(vertical_edges, horizontal_edges) * (180 / np.pi) % 360
+    return sobel_edges, np.arctan2(vertical_edges, horizontal_edges) * (180 / np.pi) % 360
+
+def canny_edge_detection(img):
+    pass
 
 def threshold_filter(img, threshold):
     img_clone = img.copy()
