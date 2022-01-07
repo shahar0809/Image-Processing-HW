@@ -3,7 +3,7 @@ import numpy as np
 from scipy.signal import convolve2d
 
 BlACK = (0, 255, 0)
-
+RED = (255, 0, 0)
 
 def sobel_edge_detection(img):
     sobel_vertical_kernel = np.matrix([
@@ -27,7 +27,6 @@ def sobel_edge_detection(img):
     # return sobel_edges, np.arctan2(vertical_edges, horizontal_edges) * (180 / np.pi) % 360
     return sobel_edges, np.arctan2(vertical_edges, horizontal_edges) * (180 / np.pi) % 360
 
-
 def threshold_filter(img, threshold):
     img_clone = img.copy()
     img_clone[img >= threshold] = 255
@@ -39,7 +38,7 @@ def canny_edge_detection(image, threshold1, threshold2, aperture_size=3, l2_grad
     return cv2.Canny(image, threshold1, threshold2, apertureSize=aperture_size, L2gradient=l2_gradient)
 
 
-def hugh_transform_circles(image):
+def hough_transform_circles(image):
     blur_image = cv2.medianBlur(image, 9)
     circles = np.uint16(np.around(cv2.HoughCircles(blur_image, cv2.HOUGH_GRADIENT, 1, 15,
                                                    param1=59, param2=75, minRadius=2, maxRadius=0)))
@@ -50,10 +49,19 @@ def hugh_transform_circles(image):
     return image
 
 
-def hugh_transform_lines(image, rho, theta, threshold, length, gap):
-    edges = cv2.Canny(image, 50, 150, apertureSize=3)
-    lines = cv2.HoughLinesP(edges, rho, theta, threshold, length, gap)
+def hough_transform_lines1(image):
+    edges = cv2.Canny(image, 40, 170, apertureSize=3, L2gradient=True)
+    return draw_lines(image, cv2.HoughLinesP(edges, 1, np.pi / 340, 197, minLineLength=190, maxLineGap=30))
 
+def hough_transform_lines2(image):
+    edges = cv2.Canny(image, 50, 150, apertureSize=3)
+    return draw_lines(image, cv2.HoughLinesP(edges, 1, np.pi / 180, 100, minLineLength=10, maxLineGap=250))
+
+def hough_transform_lines3(image):
+    edges = cv2.Canny(image, 50, 150, apertureSize=3)
+    return draw_lines(image, cv2.HoughLinesP(edges, 1, np.pi / 180, 100, minLineLength=10, maxLineGap=250))
+
+def draw_lines(image, lines):
     for line in lines:
         x1, y1, x2, y2 = line[0]
         cv2.line(image, (x1, y1), (x2, y2), BlACK, 3)
