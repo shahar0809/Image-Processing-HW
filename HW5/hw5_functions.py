@@ -1,7 +1,6 @@
 import cv2.cv2 as cv2
 import numpy as np
 from scipy.signal import convolve2d
-import math
 
 BlACK = (0, 0, 0)
 RED = (255, 0, 0)
@@ -37,8 +36,16 @@ def threshold_filter(img, threshold):
     return img_clone
 
 
-def canny_edge_detection(image, threshold1, threshold2, aperture_size=3, l2_gradient=False):
-    return cv2.Canny(image, threshold1, threshold2, apertureSize=aperture_size, L2gradient=l2_gradient)
+def canny_edge_detection1(image):
+    kernel = np.ones((5, 5), np.float32) / 25
+    blur_image = cv2.filter2D(image, -1, kernel)
+    return cv2.Canny(blur_image, 53, 203, L2gradient=True)
+
+
+def canny_edge_detection2(image):
+    kernel = np.ones((5, 5), np.float32) / 25
+    blur_image = cv2.medianBlur(image, 5)
+    return cv2.Canny(blur_image, 20, 95, L2gradient=True)
 
 
 def hough_transform_circles(image):
@@ -88,6 +95,7 @@ def get_points(line):
     y2 = int(y0 - 1000 * (a))
     return np.array([x1, y1]), np.array([x2, y2])
 
+
 def get_line_equation(line):
     point1, point2 = get_points(line)
 
@@ -109,6 +117,7 @@ def dist_between_lines(line1, line2):
     b2 = coefficients2[1]
     return abs(b1 - b2) / np.sqrt(np.square(slope1) + np.square(slope2))
 
+
 def merge_lines(lines, slope_thresh, b_thresh):
     merged_lines = np.squeeze(lines)
     for line1 in np.squeeze(lines):
@@ -122,12 +131,14 @@ def merge_lines(lines, slope_thresh, b_thresh):
                     merged_lines = merged_lines[np.not_equal(merged_lines, line2)[:, 0]]
     return list(merged_lines)
 
+
 def draw_lines_polar(image, lines, thickness=2):
     for line in lines:
         point1, point2 = get_points(line)
         cv2.line(image, (point1[0], point1[1]), (point2[0], point2[1]), BlACK, thickness)
 
     return image
+
 
 def draw_lines(image, lines, thickness=2):
     for line in lines:
