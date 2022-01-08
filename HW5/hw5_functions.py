@@ -56,13 +56,15 @@ def hough_transform_lines1(image):
     image = cv2.medianBlur(image, 5)
     edges = cv2.Canny(image, 170, 296, apertureSize=3)
     lines = cv2.HoughLines(edges, 2, 0.6 * (np.pi / 180), 250)
-    lines = merge_lines(lines, 0.5, 6)
+    lines = merge_lines(lines, 0.5, 2)
     return draw_lines_polar(image, lines)
 
 
 def hough_transform_lines2(image):
-    edges = cv2.Canny(image, 50, 150, apertureSize=3)
-    return draw_lines(image, cv2.HoughLinesP(edges, 1, np.pi / 180, 100, minLineLength=10, maxLineGap=250))
+    edges = cv2.Canny(image, 350, 400, apertureSize=3)
+    lines = cv2.HoughLines(edges, 1, 2 * np.pi / 180, 86)
+    lines = merge_lines(lines, 0.5, 5)
+    return draw_lines_polar(image, lines, 4)
 
 
 def hough_transform_lines3(image):
@@ -88,7 +90,11 @@ def get_points(line):
 
 def get_line_equation(line):
     point1, point2 = get_points(line)
-    slope = (point2[1] - point1[1]) / (point2[0] - point1[0])
+
+    if point2[0] == point1[0]:
+        slope = (point2[1] - point1[1]) / (point2[0] - point1[0] + 0.001)
+    else:
+        slope = (point2[1] - point1[1]) / (point2[0] - point1[0])
     return slope, point1[1] - slope * point1[0]
 
 
@@ -101,7 +107,6 @@ def dist_between_lines(line1, line2):
 
     slope2 = coefficients2[0]
     b2 = coefficients2[1]
-
     return abs(b1 - b2) / np.sqrt(np.square(slope1) + np.square(slope2))
 
 def merge_lines(lines, slope_thresh, b_thresh):
@@ -111,19 +116,21 @@ def merge_lines(lines, slope_thresh, b_thresh):
             if np.any(np.not_equal(line1, line2)):
                 l1 = get_line_equation(line1)
                 l2 = get_line_equation(line2)
+                points1 = get_points(line1)
+                points2 = get_points(line2)
                 if abs(l1[0] - l2[0]) < slope_thresh and dist_between_lines(line1, line2) < b_thresh:
                     merged_lines = merged_lines[np.not_equal(merged_lines, line2)[:, 0]]
     return list(merged_lines)
 
-def draw_lines_polar(image, lines):
+def draw_lines_polar(image, lines, thickness=2):
     for line in lines:
         point1, point2 = get_points(line)
-        cv2.line(image, (point1[0], point1[1]), (point2[0], point2[1]), BlACK, 2)
+        cv2.line(image, (point1[0], point1[1]), (point2[0], point2[1]), BlACK, thickness)
 
     return image
 
-def draw_lines(image, lines):
+def draw_lines(image, lines, thickness=2):
     for line in lines:
         x1, y1, x2, y2 = line[0]
-        cv2.line(image, (x1, y1), (x2, y2), BlACK, 3)
+        cv2.line(image, (x1, y1), (x2, y2), BlACK, thickness)
     return image

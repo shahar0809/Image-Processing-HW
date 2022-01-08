@@ -60,29 +60,29 @@ def main_script():
 
     # section 5 - Applying Hough Transform for lines on boxOfChocolates images
     # boxOfChocolates1
-    im5 = cv2.cvtColor(cv2.imread("boxOfchocolates1.tif"), cv2.COLOR_BGR2GRAY)
-
-    plt.figure()
-    plt.subplot(1, 2, 1)
-    plt.title("Original")
-    plt.imshow(im5, cmap='gray', vmin=0, vmax=255)
-    plt.subplot(1, 2, 2)
-    plt.title("Hough Transform - Lines, boxOfChocolates1")
-    im5_hough_transform = hough_transform_lines1(im5)
-    plt.imshow(im5_hough_transform)
-
-    # boxOfChocolates2
-    # im5 = cv2.cvtColor(cv2.imread("boxOfchocolates2.tif"), cv2.COLOR_BGR2GRAY)
+    # im5 = cv2.cvtColor(cv2.imread("boxOfchocolates1.tif"), cv2.COLOR_BGR2GRAY)
     #
     # plt.figure()
     # plt.subplot(1, 2, 1)
     # plt.title("Original")
     # plt.imshow(im5, cmap='gray', vmin=0, vmax=255)
     # plt.subplot(1, 2, 2)
-    # plt.title("Hough Transform - Lines, boxOfChocolates2")
-    # im5_hough_transform = hough_transform_lines2(im5)
-    # plt.imshow(im5_hough_transform, cmap='gray', vmin=0, vmax=255)
-    #
+    # plt.title("Hough Transform - Lines, boxOfChocolates1")
+    # im5_hough_transform = hough_transform_lines1(im5)
+    # plt.imshow(im5_hough_transform)
+
+    # boxOfChocolates2
+    im5 = cv2.cvtColor(cv2.imread("boxOfchocolates2.tif"), cv2.COLOR_BGR2GRAY)
+
+    plt.figure()
+    plt.subplot(1, 2, 1)
+    plt.title("Original")
+    plt.imshow(im5, cmap='gray', vmin=0, vmax=255)
+    plt.subplot(1, 2, 2)
+    plt.title("Hough Transform - Lines, boxOfChocolates2")
+    im5_hough_transform = hough_transform_lines2(im5)
+    plt.imshow(im5_hough_transform)
+
     # # boxOfChocolates2rot
     # im5 = cv2.cvtColor(cv2.imread("boxOfchocolates2rot.tif"), cv2.COLOR_BGR2GRAY)
     #
