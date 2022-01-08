@@ -2,8 +2,9 @@ import cv2.cv2 as cv2
 import numpy as np
 from scipy.signal import convolve2d
 
-BlACK = (0, 255, 0)
+BlACK = (0, 0, 0)
 RED = (255, 0, 0)
+
 
 def sobel_edge_detection(img):
     sobel_vertical_kernel = np.matrix([
@@ -26,6 +27,7 @@ def sobel_edge_detection(img):
     sobel_edges = sobel_edges / sobel_edges.max() * 255
     # return sobel_edges, np.arctan2(vertical_edges, horizontal_edges) * (180 / np.pi) % 360
     return sobel_edges, np.arctan2(vertical_edges, horizontal_edges) * (180 / np.pi) % 360
+
 
 def threshold_filter(img, threshold):
     img_clone = img.copy()
@@ -50,16 +52,48 @@ def hough_transform_circles(image):
 
 
 def hough_transform_lines1(image):
-    edges = cv2.Canny(image, 40, 170, apertureSize=3, L2gradient=True)
-    return draw_lines(image, cv2.HoughLinesP(edges, 1, np.pi / 340, 197, minLineLength=190, maxLineGap=30))
+    image = cv2.medianBlur(image, 5)
+    edges = cv2.Canny(image, 170, 296, apertureSize=3)
+    se = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+    edges = cv2.dilate(edges, se, iterations=1)
+    edges = cv2.erode(edges, se, iterations=1)
+    lines = cv2.HoughLinesP(edges, 1, 0.3 * (np.pi / 180), 100, minLineLength=150, maxLineGap=13)
+    #lines = merge_lines(lines, 20)
+    return draw_lines(image, lines)
+
 
 def hough_transform_lines2(image):
     edges = cv2.Canny(image, 50, 150, apertureSize=3)
     return draw_lines(image, cv2.HoughLinesP(edges, 1, np.pi / 180, 100, minLineLength=10, maxLineGap=250))
 
+
 def hough_transform_lines3(image):
     edges = cv2.Canny(image, 50, 150, apertureSize=3)
     return draw_lines(image, cv2.HoughLinesP(edges, 1, np.pi / 180, 100, minLineLength=10, maxLineGap=250))
+
+
+def dist_between_lines(line1, line2):
+    coefficients1 = np.polyfit(np.squeeze(line1)[:2], np.squeeze(line1)[2:], 1)
+    coefficients2 = np.polyfit(np.squeeze(line2)[:2], np.squeeze(line2)[2:], 1)
+
+    slope1 = coefficients1[0]
+    b1 = coefficients1[1]
+
+    slope2 = coefficients2[0]
+    b2 = coefficients2[1]
+
+    return abs(b1 - b2) / np.sqrt(np.square(slope1) + np.square(slope2))
+
+
+def merge_lines(lines, thresh):
+    merged_lines = np.squeeze(lines)
+    for line1 in np.squeeze(lines):
+        for line2 in np.squeeze(lines):
+            if np.any(np.not_equal(line1, line2)):
+                if dist_between_lines(line1, line2) <= thresh:
+                    merged_lines = merged_lines[np.not_equal(merged_lines, line2)[:, 0]]
+    return list(merged_lines)
+
 
 def draw_lines(image, lines):
     for line in lines:
