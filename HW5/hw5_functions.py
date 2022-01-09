@@ -43,7 +43,6 @@ def canny_edge_detection1(image):
 
 
 def canny_edge_detection2(image):
-    kernel = np.ones((5, 5), np.float32) / 25
     blur_image = cv2.medianBlur(image, 5)
     return cv2.Canny(blur_image, 20, 95, L2gradient=True)
 
@@ -60,10 +59,10 @@ def hough_transform_circles(image):
 
 
 def hough_transform_lines1(image):
-    image = cv2.medianBlur(image, 5)
-    edges = cv2.Canny(image, 170, 296, apertureSize=3)
+    blur_image = cv2.medianBlur(image, 5)
+    edges = cv2.Canny(blur_image, 170, 296, apertureSize=3)
     lines = cv2.HoughLines(edges, 2, 0.6 * (np.pi / 180), 250)
-    lines = merge_lines(lines, 0.5, 2)
+    lines = merge_lines(lines, 0.5, 6)
     return draw_lines_polar(image, lines)
 
 
@@ -75,13 +74,17 @@ def hough_transform_lines2(image):
 
 
 def hough_transform_lines3(image):
-    edges = cv2.Canny(image, 50, 150, apertureSize=3)
-    return draw_lines(image, cv2.HoughLinesP(edges, 1, np.pi / 180, 100, minLineLength=10, maxLineGap=250))
+    blur_image = cv2.GaussianBlur(image, (35, 35), 1)
+    edges = cv2.Canny(blur_image, 10, 170, apertureSize=3)
+    lines = cv2.HoughLines(edges, 1, 3 * np.pi / 180, 122)
+    lines = np.squeeze(lines)
+    return draw_lines_polar(image, lines, 1)
 
 
 """
 Utility functions for removing similar lines.
 """
+
 
 def get_points(line):
     r, theta = line
@@ -89,10 +92,10 @@ def get_points(line):
     b = np.sin(theta)
     x0 = a * r
     y0 = b * r
-    x1 = int(x0 + 1000 * (-b))
-    y1 = int(y0 + 1000 * (a))
-    x2 = int(x0 - 1000 * (-b))
-    y2 = int(y0 - 1000 * (a))
+    x1 = int(x0 + 1000 * -b)
+    y1 = int(y0 + 1000 * a)
+    x2 = int(x0 - 1000 * -b)
+    y2 = int(y0 - 1000 * a)
     return np.array([x1, y1]), np.array([x2, y2])
 
 
@@ -125,8 +128,6 @@ def merge_lines(lines, slope_thresh, b_thresh):
             if np.any(np.not_equal(line1, line2)):
                 l1 = get_line_equation(line1)
                 l2 = get_line_equation(line2)
-                points1 = get_points(line1)
-                points2 = get_points(line2)
                 if abs(l1[0] - l2[0]) < slope_thresh and dist_between_lines(line1, line2) < b_thresh:
                     merged_lines = merged_lines[np.not_equal(merged_lines, line2)[:, 0]]
     return list(merged_lines)
