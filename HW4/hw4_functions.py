@@ -5,8 +5,7 @@ from scipy.ndimage import median_filter
 
 
 def print_IDs():
-    print("213991029 + 213996549 \n")
-
+	pass
 
 # baby
 def clean_im1(img):

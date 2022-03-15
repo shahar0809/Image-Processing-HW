@@ -115,4 +115,4 @@ if __name__ == "__main__":
     image_list_d = createMorphSequence(section_d_img1_gray, section_d1_pts, section_d_img2_gray, section_d2_pts,
                                        np.linspace(0, 1, 100), 1)
 
-    writeMorphingVideo(image_list_d, "213996549_213991029")
+    writeMorphingVideo(image_list_d, "vid")
